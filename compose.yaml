@@ -1,7 +1,4 @@
-# compose.base.yml 
-#
-# partially configured services 
-# deploy in both test and prod
+# compose.yaml
 services:
 
   db:
@@ -9,7 +6,7 @@ services:
     image: postgres:18-alpine
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -26,7 +23,7 @@ services:
       - "${APP_PORT}:3000"
     environment:
       - ENV=${ENV}
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - TZ=America/New_York
     depends_on:
       - db
