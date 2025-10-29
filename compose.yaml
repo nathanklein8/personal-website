@@ -1,7 +1,4 @@
-# compose.base.yml 
-#
-# partially configured services 
-# deploy in both test and prod
+# compose.yaml
 services:
 
   db:
