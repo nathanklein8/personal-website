@@ -10,16 +10,31 @@ export async function POST({ params }: RequestEvent) {
     return json({ error: 'Invalid ID' }, { status: 400 });
   }
 
-  // increment the count atomically
-  const [updated] = await db
-    .update(test)
-    .set({ count: sql`${test.count} + 1 ` })
-    .where(eq(test.id, id))
-    .returning();
+  let updated;
 
-  if (!updated) {
-    return json({ error: 'ID not found' }, { status: 404 });
-  }
+  await db.transaction(async (tx) => {
+    // Try to update the row
+    const result = await tx
+      .update(test)
+      .set({ count: sql`${test.count} + 1` })
+      .where(eq(test.id, id))
+      .returning();
+
+    if (result.length === 0) {
+      // Row doesn't exist — insert it with count = 0
+      await tx.insert(test).values({ id, count: 0 });
+      // Increment the count after inserting
+      const newResult = await tx
+        .update(test)
+        .set({ count: sql`${test.count} + 1` })
+        .where(eq(test.id, id))
+        .returning();
+
+      updated = newResult[0];
+    } else {
+      updated = result[0];
+    }
+  });
 
   return json(updated);
 }
