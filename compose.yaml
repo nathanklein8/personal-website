@@ -17,13 +17,16 @@ services:
 
   app:
     container_name: pwsite-${ENV}-app
-    build: .
+    build:
+      context: .
+      args:
+        DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
     restart: unless-stopped
     ports:
       - "${APP_PORT}:3000"
     environment:
       - ENV=${ENV}
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+      #- DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
       - TZ=America/New_York
     depends_on:
       - db

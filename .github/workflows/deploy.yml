@@ -37,8 +37,7 @@ jobs:
         run: |
           COMPOSE_BAKE=true docker compose \
             -f compose.yaml \
-            up -d --build --remove-orphans \
-            --build-arg DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}"
+            up -d --build --remove-orphans
 
       - name: Connect App container to proxy network (prod only)
         if: env.ENV == 'prod'
