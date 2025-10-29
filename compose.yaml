@@ -17,10 +17,7 @@ services:
 
   app:
     container_name: pwsite-${ENV}-app
-    build:
-      context: .
-      args:
-        DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+    build: .
     restart: unless-stopped
     ports:
       - "${APP_PORT}:3000"

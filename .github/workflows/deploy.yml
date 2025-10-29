@@ -33,11 +33,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build and Start updated container
+      - name: Build image
         run: |
-          COMPOSE_BAKE=true docker compose \
-            -f compose.yaml \
-            up -d --build --remove-orphans
+          docker compose -f compose.yaml build \
+            --build-arg DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}
+      
+      - name: Start containers
+        run: docker compose -f compose.yaml up -d --remove-orphans
 
       - name: Connect App container to proxy network (prod only)
         if: env.ENV == 'prod'
