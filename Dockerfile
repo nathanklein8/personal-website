@@ -1,33 +1,30 @@
-FROM oven/bun:1 AS builder
-
-# Create app directory
+# Build Step
+FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy dependency files
-COPY bun.lockb package.json ./
-
-# Install dependencies
-RUN bun install --frozen-lockfile
-
-# Copy rest of the project
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev
 COPY . .
+RUN npm run build
 
-# Build for production
-RUN bun run build
+#
+# Copy to production image
+#
 
-FROM oven/bun:1 AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Copy only the built output and necessary files
+# Copy only built output and necessary files
 COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
 
-# Install only production dependencies
-RUN bun install --frozen-lockfile --production
+# copy over static assets
+# COPY --from=builder /app/static ./static
 
-# Expose the default SvelteKit port
+# Set NODE_ENV to production
+ENV NODE_ENV=production
 EXPOSE 3000
 
-# Run the built SvelteKit app
-CMD ["bun", "run", "build"]
+# Start the Node server
+CMD ["node", "build"]
