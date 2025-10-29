@@ -3,9 +3,13 @@ name: Run Database Migrations
 on:
   # manual execution from actions UI
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy App"]
+    types: [completed]
     
 jobs:
   migrate:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && contains(github.event.workflow_run.head_commit.message, '[migrate]')) }}
     runs-on: self-hosted
     # set which env to pull secrets/vars from
     environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}

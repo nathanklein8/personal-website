@@ -45,12 +45,3 @@ jobs:
 
       - name: Cleanup unused images
         run: docker image prune -f
-
-      - name: Trigger migration workflow (if [migrate] in commit)
-        if: contains(github.event.head_commit.message, '[migrate]')
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Triggering migrate.yml after deploy..."
-          gh workflow run "Run Database Migrations" \
-            --ref "${{ github.ref_name }}"
