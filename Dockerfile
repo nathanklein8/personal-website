@@ -4,8 +4,6 @@ WORKDIR /app
 COPY bun.lock package.json ./
 RUN bun install --frozen-lockfile
 COPY . .
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
 RUN bun run build
 
 #

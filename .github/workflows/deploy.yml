@@ -15,7 +15,6 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-
     # set which env to pull secrets/vars from
     environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
 
@@ -33,17 +32,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build image
+      - name: Build and Start updated container
         run: |
-          docker compose -f compose.yaml build \
-            --build-arg DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}
+          COMPOSE_BAKE=true docker compose \
+            -p pwsite-${ENV} \
+            -f compose.yaml \
+            up -d --build --remove-orphans
       
-      - name: Start containers
-        run: docker compose -f compose.yaml up -d --remove-orphans
-
       - name: Connect App container to proxy network (prod only)
         if: env.ENV == 'prod'
         run: docker network connect ${PROXY_NET} pwsite-prod-app
 
       - name: Cleanup unused images
         run: docker image prune -f
+
+      - name: Trigger migration workflow (if [migrate] in commit)
+        if: contains(github.event.head_commit.message, '[migrate]')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Triggering migrate.yml after deploy..."
+          gh workflow run "Run Database Migrations" \
+            --ref "${{ github.ref_name }}"

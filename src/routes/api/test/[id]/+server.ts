@@ -1,7 +1,9 @@
-import { db } from '$lib/server/db/client';
+import { getDb } from '$lib/server/db/client';
 import { test } from '$lib/server/db/schema';
 import { json, type RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+
+const db = getDb();
 
 export async function GET({ params }: RequestEvent) {
   const id = Number(params.id);
