@@ -1,4 +1,5 @@
 <section class="flex h-screen flex-col items-center justify-center bg-gray-50">
+	<h1>Photography</h1>
 	<p class="text-xl text-gray-700 mb-8">Under Construction</p>
 	<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"
 		><path
