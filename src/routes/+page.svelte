@@ -18,8 +18,6 @@
 	import ProjectCard from '$lib/components/project-card.svelte';
 	import { cn } from '$lib/utils';
 
-	const isMobile = Device.isPhone || Device.isTablet;
-
 	const languages = ['TypeScript', 'Python', 'Java', 'C', 'SQL'];
 	const fullstacktechs = [
 		'React',
@@ -37,6 +35,9 @@
 	let copied = false;
 
 	onMount(() => {
+
+		const isMobile: boolean = Device.isPhone || Device.isTablet;
+
 		if (window.scrollY > window.innerHeight * 0.05) {
 			showScrollIcon = false;
 			return; // No need to add scroll listener
