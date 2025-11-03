@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import CardFooter from '$lib/components/ui/card/card-footer.svelte';
 	import {
@@ -17,7 +16,6 @@
 	import { fade } from 'svelte/transition';
 	import Device from 'svelte-device-info';
 	import ProjectCard from '$lib/components/project-card.svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils';
 
 	const isMobile = Device.isPhone || Device.isTablet;
@@ -56,14 +54,6 @@
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
-
-	async function copyToClipboard(text: string) {
-		await navigator.clipboard.writeText(text);
-		copied = true;
-		setTimeout(() => {
-			copied = false;
-		}, 3000);
-	}
 </script>
 
 <section
