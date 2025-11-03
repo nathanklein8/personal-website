@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
-	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import CardFooter from '$lib/components/ui/card/card-footer.svelte';
 	import {
@@ -17,10 +16,7 @@
 	import { fade } from 'svelte/transition';
 	import Device from 'svelte-device-info';
 	import ProjectCard from '$lib/components/project-card.svelte';
-	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { cn } from '$lib/utils';
-
-	const isMobile = Device.isPhone || Device.isTablet;
 
 	const languages = ['TypeScript', 'Python', 'Java', 'C', 'SQL'];
 	const fullstacktechs = [
@@ -39,6 +35,9 @@
 	let copied = false;
 
 	onMount(() => {
+
+		const isMobile: boolean = Device.isPhone || Device.isTablet;
+
 		if (window.scrollY > window.innerHeight * 0.05) {
 			showScrollIcon = false;
 			return; // No need to add scroll listener
@@ -57,13 +56,16 @@
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
 
-	async function copyToClipboard(text: string) {
-		await navigator.clipboard.writeText(text);
-		copied = true;
-		setTimeout(() => {
-			copied = false;
-		}, 3000);
+	async function copyEmail() {
+		try {
+			await navigator.clipboard.writeText('neklein3@gmail.com');
+			copied = true;
+			setTimeout(() => (copied = false), 3000);
+		} catch (e) {
+			console.error('Clipboard write failed', e);
+		}
 	}
+
 </script>
 
 <section
@@ -107,13 +109,7 @@
 							copied ? 'text-muted-foreground' : '',
 							'font-code flex w-full flex-row items-center rounded-lg border-2 bg-background/80 p-3 text-sm'
 						)}
-						onclick={() => {
-							navigator.clipboard.writeText('neklein3@gmail.com');
-							copied = true;
-							setTimeout(() => {
-								copied = false;
-							}, 3000);
-						}}
+						onclick={copyEmail}
 					>
 						$ neklein3@gmail.com
 						<span class="flex grow"></span>
