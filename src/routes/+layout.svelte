@@ -11,12 +11,13 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&family=Jersey+10&display=swap" rel="stylesheet">
 </svelte:head>
 
 <Header visible={true} />
 
 <ModeWatcher />
 
-<div class="pt-16">
+<div class="">
 	{@render children?.()}
 </div>

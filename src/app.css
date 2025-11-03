@@ -125,3 +125,8 @@
   font-family: 'Jersey 10', monospace;
   letter-spacing: 2px;
 }
+
+.font-code {
+  font-family: "Google Sans Code", monospace;
+  letter-spacing: 2px;
+}
