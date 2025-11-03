@@ -54,6 +54,17 @@
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
+
+	async function copyEmail() {
+		try {
+			await navigator.clipboard.writeText('neklein3@gmail.com');
+			copied = true;
+			setTimeout(() => (copied = false), 3000);
+		} catch (e) {
+			console.error('Clipboard write failed', e);
+		}
+	}
+
 </script>
 
 <section
@@ -97,13 +108,7 @@
 							copied ? 'text-muted-foreground' : '',
 							'font-code flex w-full flex-row items-center rounded-lg border-2 bg-background/80 p-3 text-sm'
 						)}
-						onclick={() => {
-							navigator.clipboard.writeText('neklein3@gmail.com');
-							copied = true;
-							setTimeout(() => {
-								copied = false;
-							}, 3000);
-						}}
+						onclick={copyEmail}
 					>
 						$ neklein3@gmail.com
 						<span class="flex grow"></span>
