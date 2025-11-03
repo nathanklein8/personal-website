@@ -1,19 +1,26 @@
-<script>
+<script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
+	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import CardFooter from '$lib/components/ui/card/card-footer.svelte';
-	import CardTitle from '$lib/components/ui/card/card-title.svelte';
 	import {
 		ArrowUpRight,
 		BadgeQuestionMark,
 		BookOpenCheck,
 		CircleArrowDown,
-		MessageCircle,
-		Puzzle
+		Clipboard,
+		ClipboardCheck,
+		MessageCircle
 	} from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import { expoIn } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
+	import Device from 'svelte-device-info';
+	import ProjectCard from '$lib/components/project-card.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
+	import { cn } from '$lib/utils';
+
+	const isMobile = Device.isPhone || Device.isTablet;
 
 	const languages = ['TypeScript', 'Python', 'Java', 'C', 'SQL'];
 	const fullstacktechs = [
@@ -29,13 +36,14 @@
 	const mltechs = ['Pytorch', 'scikit-learn', 'mlflow'];
 
 	let showScrollIcon = false;
+	let copied = false;
 
 	onMount(() => {
 		if (window.scrollY > window.innerHeight * 0.05) {
 			showScrollIcon = false;
 			return; // No need to add scroll listener
 		} else {
-			showScrollIcon = true;
+			showScrollIcon = !isMobile;
 		}
 		const handleScroll = () => {
 			const scrollY = window.scrollY;
@@ -48,11 +56,19 @@
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
+
+	async function copyToClipboard(text: string) {
+		await navigator.clipboard.writeText(text);
+		copied = true;
+		setTimeout(() => {
+			copied = false;
+		}, 3000);
+	}
 </script>
 
 <section
 	id="landing"
-	class="flex min-h-[calc(100vh-64px)] flex-col items-center justify-center gap-y-8 bg-gradient-to-b from-green-700 to-background py-12"
+	class="flex min-h-screen flex-col items-center gap-y-8 bg-gradient-to-b from-green-700 to-background to-60% pt-24 sm:pt-32"
 >
 	<div class="mx-auto max-w-4xl space-y-8">
 		<div class="space-y-4 text-center">
@@ -61,16 +77,13 @@
 					<img src="/me.jpg" alt="me" />
 				</div>
 			</div>
-
-			<h2 class="font-pixel text-2xl text-5xl">Hi! I'm Nathan</h2>
-			<p class="mx-auto max-w-2xl">New Grad | CS @ RIT</p>
+			<h2 class="font-pixel text-4xl md:text-5xl">Hi! I'm Nathan</h2>
+			<p class="">New Grad | CS @ RIT</p>
 		</div>
 	</div>
 
-	<Card
-		class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] dark:shadow-stone-800"
-	>
-		<CardContent class="grid gap-6 md:grid-cols-2">
+	<Card class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]">
+		<CardContent class="grid gap-6 sm:grid-cols-2">
 			<div class="space-y-4">
 				<h1 class="font-pixel flex items-center gap-2 text-2xl">
 					<BadgeQuestionMark size={22} />
@@ -88,9 +101,29 @@
 					<MessageCircle size={22} />
 					Contact
 				</h1>
-				<div class="space-y-2">
-					<p class="flex items-center gap-2">neklein3@gmail.com</p>
-					<p class="flex max-w-fit items-center gap-2 border-foreground hover:border-b">
+				<div class="space-y-3">
+					<button
+						class={cn(
+							copied ? 'text-muted-foreground' : '',
+							'font-code flex w-full flex-row items-center rounded-lg border-2 bg-background/80 p-3 text-sm'
+						)}
+						onclick={() => {
+							navigator.clipboard.writeText('neklein3@gmail.com');
+							copied = true;
+							setTimeout(() => {
+								copied = false;
+							}, 3000);
+						}}
+					>
+						$ neklein3@gmail.com
+						<span class="flex grow"></span>
+						{#if copied}
+							<ClipboardCheck size={20} />
+						{:else}
+							<Clipboard size={20} />
+						{/if}
+					</button>
+					<p class="flex max-w-fit items-center gap-2 underline-offset-4 hover:underline">
 						<a
 							class="flex items-center gap-0.5"
 							href="https://www.linkedin.com/in/neklein"
@@ -98,8 +131,8 @@
 							rel="noopener noreferrer"
 						>
 							Connect with me on LinkedIn
-							<ArrowUpRight size={20} />
 						</a>
+						<ArrowUpRight size={20} />
 					</p>
 				</div>
 			</div>
@@ -139,7 +172,7 @@
 		<div
 			in:fade={{ duration: 1200, easing: expoIn }}
 			out:fade={{ duration: 200 }}
-			class="fixed bottom-0 left-0 mb-4 flex w-full flex-col items-center gap-y-4"
+			class="fixed bottom-0 left-0 mb-6 flex w-full flex-col items-center gap-y-4 text-muted-foreground"
 		>
 			<p>Check out what I've done!</p>
 			<CircleArrowDown class="animate-bounce" size={32} />
@@ -147,49 +180,40 @@
 	{/if}
 </section>
 
-<section id="projects" class="flex flex-col items-center justify-center gap-y-8 py-16">
-	<h1 class="font-pixel text-center text-4xl">Some projects I've worked on...</h1>
+<section
+	id="projects"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 pt-24 pb-12"
+>
+	<h1 class="font-pixel text-center text-2xl md:text-4xl">Some projects I've worked on...</h1>
 
-	<Card
-		class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw] dark:shadow-stone-800"
-	>
-		<CardTitle class="font-pixel flex flex-row items-center gap-2 px-6 text-2xl">
-			<Puzzle size={22} />
-			<h1>Hangman Web App</h1>
-			<span class="flex grow"></span>
+	<ProjectCard
+		icon="Puzzle"
+		title="Hangman Web App"
+		deploymentLink="https://app.nklein.xyz"
+		technologies={[
+			'React',
+			'Next.js',
+			'TypeScript',
+			'Prisma',
+			'PostgreSQL',
+			'tailwindCSS',
+			'Docker'
+		]}
+		description={'Full-stack word-guessing game built with \
+			React, Prisma, and PostgreSQL. It features a daily global \
+			challenge word and player statistics, all managed server-side for consistent gameplay across \
+			users. The application is self-hosted on my home server for complete control over deployment \
+			and data.'}
+		image="/hangman.jpg"
+	/>
 
-			<p class="flex flex-row max-w-fit items-center gap-2 border-foreground hover:border-b">
-				<a href="https://app.nklein.xyz" target="_blank" rel="noopener noreferrer">
-					check it out
-				</a>
-        <ArrowUpRight size={32} />
-			</p>
-		</CardTitle>
-		<CardContent class="grid gap-6 md:grid-cols-2">
-			<img
-				src="/hangman.jpg"
-				alt="Screenshot of my Hangman Webapp"
-				class="w-full max-w-80 rounded-lg object-cover md:max-w-full"
-			/>
-			<p class="text-md text-muted-foreground">
-				Full-stack word-guessing game built with <span class="font-medium text-foreground"
-					>React</span
-				>,
-				<span class="font-medium text-foreground">Prisma</span>, and
-				<span class="font-medium text-foreground">PostgreSQL</span>. It features a daily global
-				challenge word and player statistics, all managed server-side for consistent gameplay across
-				users. The application is self-hosted on my home server for complete control over deployment
-				and data.
-			</p>
-		</CardContent>
-		<CardFooter class="flex flex-wrap gap-2 border-t">
-			<Badge variant="secondary">React</Badge>
-			<Badge variant="secondary">Next.js</Badge>
-			<Badge variant="secondary">TypeScript</Badge>
-			<Badge variant="secondary">Prisma</Badge>
-			<Badge variant="secondary">PostgreSQL</Badge>
-			<Badge variant="secondary">tailwindCSS</Badge>
-			<Badge variant="secondary">Docker</Badge>
-		</CardFooter>
-	</Card>
+	<ProjectCard
+		icon="Globe"
+		title="This Website!"
+		technologies={['Svelte', 'Typescript', 'drizzle', 'PostgreSQL', 'tailwindCSS', 'Docker']}
+		description={'Svelte application fed with data from a PostgreSQL database via drizzle, \
+			to allow for dynamic content changes without redeployment.  Deployed with Github \
+			Actions CI/CD pipeline on my home server.'}
+		image=""
+	/>
 </section>

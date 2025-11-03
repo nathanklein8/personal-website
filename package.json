@@ -57,6 +57,7 @@
 		"dotenv": "^17.2.3",
 		"mode-watcher": "^1.1.0",
 		"pg": "^8.16.3",
+		"svelte-device-info": "^1.0.6",
 		"tailwindcss-animate": "^1.0.7"
 	}
 }
