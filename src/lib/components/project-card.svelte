@@ -40,8 +40,8 @@
 <Card
 	class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]"
 >
-	<CardTitle class="font-pixel flex grid flex-row items-center gap-3 px-6 text-2xl sm:grid-cols-2">
-		<h1 class="flex items-center gap-3">
+	<CardTitle class="font-code flex grid flex-row items-center gap-3 px-6 text-xl sm:grid-cols-2">
+		<h1 class="flex items-center gap-2">
 			<svelte:component this={IconComponent} size={22} />
 			{title}
 		</h1>
@@ -50,7 +50,7 @@
                 <span class="flex md:grow"></span>
 				<Button variant="green">
 					<a
-						class="font-pixel text-2xl"
+						class="font-code text-md md:text-lg"
 						href={deploymentLink}
 						target="_blank"
 						rel="noopener noreferrer"
