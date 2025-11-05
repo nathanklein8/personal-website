@@ -17,6 +17,7 @@
 	import Device from 'svelte-device-info';
 	import ProjectCard from '$lib/components/project-card.svelte';
 	import { cn } from '$lib/utils';
+	import { TypeWriter } from 'svelte-typewrite';
 
 	const languages = ['TypeScript', 'Python', 'Java', 'C', 'SQL'];
 	const fullstacktechs = [
@@ -35,7 +36,6 @@
 	let copied = false;
 
 	onMount(() => {
-
 		const isMobile: boolean = Device.isPhone || Device.isTablet;
 
 		if (window.scrollY > window.innerHeight * 0.05) {
@@ -65,12 +65,11 @@
 			console.error('Clipboard write failed', e);
 		}
 	}
-
 </script>
 
 <section
 	id="landing"
-	class="flex min-h-screen flex-col items-center gap-y-8 bg-gradient-to-b from-green-700 to-background to-60% pt-24 sm:pt-32"
+	class="flex min-h-screen flex-col items-center gap-y-8 bg-gradient-to-b from-green-700 to-background to-55% md:to-70% pt-24 sm:pt-32"
 >
 	<div class="mx-auto max-w-4xl space-y-8">
 		<div class="space-y-4 text-center">
@@ -79,15 +78,17 @@
 					<img src="/me.jpg" alt="me" />
 				</div>
 			</div>
-			<h2 class="font-pixel text-4xl md:text-5xl">Hi! I'm Nathan</h2>
-			<p class="">New Grad | CS @ RIT</p>
+			<h1 class="font-code text-3xl md:text-4xl">Hi! I'm Nathan</h1>
+			<h2 class="text-xl md:text-2xl">
+				<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
+			</h2>
 		</div>
 	</div>
 
 	<Card class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]">
 		<CardContent class="grid gap-6 sm:grid-cols-2">
 			<div class="space-y-4">
-				<h1 class="font-pixel flex items-center gap-2 text-2xl">
+				<h1 class="font-code flex items-center gap-2 text-xl">
 					<BadgeQuestionMark size={22} />
 					About Me
 				</h1>
@@ -99,7 +100,7 @@
 			</div>
 
 			<div class="space-y-4">
-				<h1 class="font-pixel flex items-center gap-2 text-2xl">
+				<h1 class="font-code flex items-center gap-2 text-xl">
 					<MessageCircle size={22} />
 					Contact
 				</h1>
@@ -107,7 +108,7 @@
 					<button
 						class={cn(
 							copied ? 'text-muted-foreground' : '',
-							'font-code flex w-full flex-row items-center rounded-lg border-2 bg-background/80 p-3 text-sm'
+							'font-code-wide flex w-full flex-row items-center rounded-lg border-2 bg-background/80 p-3 text-sm'
 						)}
 						onclick={copyEmail}
 					>
@@ -119,7 +120,7 @@
 							<Clipboard size={20} />
 						{/if}
 					</button>
-					<p class="flex max-w-fit items-center gap-2 underline-offset-4 hover:underline">
+					<p class="flex max-w-fit items-center gap-1 underline-offset-4 hover:underline">
 						<a
 							class="flex items-center gap-0.5"
 							href="https://www.linkedin.com/in/neklein"
@@ -135,7 +136,7 @@
 		</CardContent>
 		<CardFooter class="border-t">
 			<div class="flex flex-col gap-3">
-				<h1 class="font-pixel flex items-center gap-2 text-2xl">
+				<h1 class="font-code flex items-center gap-2 text-xl">
 					<BookOpenCheck size={22} />
 					I have experience with
 				</h1>
@@ -178,9 +179,9 @@
 
 <section
 	id="projects"
-	class="flex min-h-screen flex-col items-center justify-center gap-y-12 pt-24 pb-12"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 py-16"
 >
-	<h1 class="font-pixel text-center text-2xl md:text-4xl">Some projects I've worked on...</h1>
+	<h1 class="font-code text-center text-lg md:text-3xl">Some projects I've worked on...</h1>
 
 	<ProjectCard
 		icon="Puzzle"

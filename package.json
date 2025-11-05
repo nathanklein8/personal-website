@@ -58,6 +58,7 @@
 		"mode-watcher": "^1.1.0",
 		"pg": "^8.16.3",
 		"svelte-device-info": "^1.0.6",
+		"svelte-typewrite": "^3.0.0",
 		"tailwindcss-animate": "^1.0.7"
 	}
 }

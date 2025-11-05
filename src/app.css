@@ -128,5 +128,10 @@
 
 .font-code {
   font-family: "Google Sans Code", monospace;
+  letter-spacing: 0px;
+}
+
+.font-code-wide {
+  font-family: "Google Sans Code", monospace;
   letter-spacing: 2px;
 }
