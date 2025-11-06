@@ -9,6 +9,7 @@ on:
       - "backend/migrations/**"
       - "backend/schema.hcl"
       - ".github/workflows/database.yml"
+      - "compose.yaml"
 
 jobs:
   migrate-db:

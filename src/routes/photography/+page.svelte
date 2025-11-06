@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 
-	export const API_URL = 'http://backend:8080';
+	export const API_URL = 'http://pwsite-test-backend:8082';
 
 	let newNote = '';
 	let incrementId: number | null = null;
@@ -12,6 +12,7 @@
 	// Create a new test item
 	async function handleCreate() {
 		console.log('creating' + newNote);
+		console.log('calling ' + `${API_URL}/api/test`);
 		const res = await fetch(`${API_URL}/api/test`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -31,6 +32,7 @@
 	// Increment count for a given test item
 	async function handleIncrement() {
 		console.log('incrementing' + incrementId);
+		console.log('calling ' + `${API_URL}/api/test/${incrementId}/increment`);
 		if (incrementId === null) return;
 
 		const res = await fetch(`${API_URL}/api/test/${incrementId}/increment`, {
