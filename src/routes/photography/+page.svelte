@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import { API_URL } from '$env/static/private';
 
-	// export const API_URL = import.meta.env.API_URL || 'http://localhost:8123';
+	export const API_URL = 'http://backend:8080';
 
 	let newNote = '';
 	let incrementId: number | null = null;

@@ -9,7 +9,6 @@ services:
       - "${APP_PORT}:3000"
     environment:
       - TZ=America/New_York
-      - API_URL=http://backend:${BACKEND_PORT}
     depends_on:
       - backend
 
