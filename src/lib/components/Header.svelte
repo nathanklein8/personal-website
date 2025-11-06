@@ -38,7 +38,7 @@
 				<SheetTrigger>
 					<Button variant="ghost" size="icon-sm"><Menu /></Button>
 				</SheetTrigger>
-				<SheetContent side="right" class="w-1/2 min-w-fit">
+				<SheetContent side="right" class="w-2/5 min-w-fit">
 					<SheetHeader class="font-code h-12 border-b"></SheetHeader>
 					<div class="mx-4 flex flex-col gap-4 text-base items-end text-lg">
 						<SheetClose>

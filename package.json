@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "source .env && DATABASE_URL=${DATABASE_URL} vite dev",
+		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -12,11 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"db:start": "docker compose up -d db",
-		"db:push": "source .env && DATABASE_URL=${DATABASE_URL} drizzle-kit push",
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "source .env && DATABASE_URL=${DATABASE_URL} drizzle-kit studio"
+		"db:start": "docker compose up -d db"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
@@ -33,8 +29,6 @@
 		"@types/pg": "^8.15.6",
 		"bits-ui": "^2.11.0",
 		"clsx": "^2.1.1",
-		"drizzle-kit": "^0.31.4",
-		"drizzle-orm": "^0.44.5",
 		"eslint": "^9.36.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.12.4",
@@ -56,7 +50,6 @@
 	"dependencies": {
 		"dotenv": "^17.2.3",
 		"mode-watcher": "^1.1.0",
-		"pg": "^8.16.3",
 		"svelte-device-info": "^1.0.6",
 		"svelte-typewrite": "^3.0.0",
 		"tailwindcss-animate": "^1.0.7"

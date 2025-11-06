@@ -1,20 +1,21 @@
-name: Deploy App
+name: Build & Deploy Frontend
 
 on:
   push:
     branches:
       - main # prod
       - test
-    # don't deploy on non code changes
     paths-ignore:
+      - 'backend/**'
       - 'README.md'
       - '**/README.md'
       - '*.example'
       - '.gitignore'
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: self-hosted
+
     # set which env to pull secrets/vars from
     environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
 
@@ -25,23 +26,20 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-      PROXY_NET: 'nathan_default'
 
     steps:
+      - uses: actions/checkout@v4
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
 
-      - name: Build and Start updated container
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: app:latest
+
+      - name: Restart Frontend Service
         run: |
-          COMPOSE_BAKE=true docker compose \
-            -p pwsite-${ENV} \
-            -f compose.yaml \
-            up -d --build --remove-orphans
-      
-      - name: Connect App container to proxy network (prod only)
-        if: env.ENV == 'prod'
-        run: docker network connect ${PROXY_NET} pwsite-prod-app
-
-      - name: Cleanup unused images
-        run: docker image prune -f
+          docker compose up -d --no-deps --build app
