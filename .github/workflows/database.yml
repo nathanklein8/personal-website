@@ -1,0 +1,41 @@
+name: Deploy Database & Migrate
+
+on:
+  push:
+    branches:
+      - main # prod
+      - test
+    paths:
+      - "backend/migrations/**"
+      - "backend/schema.hcl"
+      - ".github/workflows/migrate.yml"
+
+jobs:
+  migrate-db:
+    runs-on: self-hosted
+
+    # set which env to pull secrets/vars from
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+
+    env:
+      # used in migrations action, use localhost not 'db' container name
+      DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:${{ vars.POSTGRES_PORT }}/${{ vars.POSTGRES_DB }}?sslmode=disable"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Atlas CLI
+        uses: ariga/setup-atlas@v0
+        with:
+          version: latest
+
+      - name: Verify Atlas installation
+        run: atlas version
+
+      - name: Apply Migrations
+        uses: ariga/atlas-action/migrate/apply@v1
+        with:
+          dir: file://backend/migrations
+          url: ${{ env.DATABASE_URL }}
+

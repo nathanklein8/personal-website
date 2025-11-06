@@ -7,7 +7,7 @@
 		SheetHeader,
 		SheetClose
 	} from '$lib/components/ui/sheet';
-	import { Button } from '$lib/components/ui/button';
+	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import { Menu } from '@lucide/svelte';
 
 	export let visible = false;
@@ -36,7 +36,9 @@
 			<ModeToggle />
 			<Sheet>
 				<SheetTrigger>
-					<Button variant="ghost" size="icon-sm"><Menu /></Button>
+					<div class={buttonVariants({variant: "ghost", size: "icon-sm"})}>
+						<Menu />
+					</div>
 				</SheetTrigger>
 				<SheetContent side="right" class="w-2/5 min-w-fit">
 					<SheetHeader class="font-code h-12 border-b"></SheetHeader>

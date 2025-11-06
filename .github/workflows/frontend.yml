@@ -22,10 +22,7 @@ jobs:
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       APP_PORT: ${{ vars.APP_PORT }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
 
     steps:
       - uses: actions/checkout@v4
