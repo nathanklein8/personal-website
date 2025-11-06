@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import { PUBLIC_API_URL } from '$env/static/public';
-
-	// const API_URL = import.meta.env.PUBLIC_API_URL;
 
 	let newNote = '';
 	let incrementId: number | null = null;
@@ -12,9 +9,7 @@
 
 	// Create a new test item
 	async function handleCreate() {
-		console.log('creating' + newNote);
-		console.log('calling ' + `${PUBLIC_API_URL}/api/test`);
-		const res = await fetch(`${PUBLIC_API_URL}/api/test`, {
+		const res = await fetch('/api/test', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ note: newNote })
@@ -32,11 +27,9 @@
 
 	// Increment count for a given test item
 	async function handleIncrement() {
-		console.log('incrementing' + incrementId);
-		console.log('calling ' + `${PUBLIC_API_URL}/api/test/${incrementId}/increment`);
 		if (incrementId === null) return;
 
-		const res = await fetch(`${PUBLIC_API_URL}/api/test/${incrementId}/increment`, {
+		const res = await fetch(`/api/test/${incrementId}/increment`, {
 			method: 'POST'
 		});
 
@@ -51,8 +44,6 @@
 </script>
 
 <section class="flex h-screen flex-col items-center justify-center bg-gray-50 gap-6 p-4">
-
-	<div>API URL: {PUBLIC_API_URL}</div>
 
 	<div class="flex flex-col items-center gap-2">
 		<h2 class="text-xl font-semibold">Create Test Item</h2>

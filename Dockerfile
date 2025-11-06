@@ -1,12 +1,11 @@
 # Build Step
 FROM oven/bun:latest AS builder
 WORKDIR /app
-ARG PUBLIC_API_URL
-RUN echo "PUBLIC_API_URL=${PUBLIC_API_URL}" > .env
+ARG API_URL
 COPY bun.lock package.json ./
 RUN bun install --frozen-lockfile
 COPY . .
-RUN bun run build
+RUN API_URL=$API_URL bun run build
 
 #
 # Copy to production image
