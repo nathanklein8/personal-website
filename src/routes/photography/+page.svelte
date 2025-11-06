@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 
-	export const API_URL = 'http://pwsite-test-backend:8082';
+	export const API_URL = 'http://atlas:8082';
 
 	let newNote = '';
 	let incrementId: number | null = null;
