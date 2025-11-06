@@ -18,12 +18,16 @@ jobs:
     environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
 
     env:
-      # used in migrations action, use localhost not 'db' container name
-      DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:${{ vars.POSTGRES_PORT }}/${{ vars.POSTGRES_DB }}?sslmode=disable"
+      ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+      
+      # need to set up db container
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+
+      # pass this to migration command
+      DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:${{ vars.POSTGRES_PORT }}/${{ vars.POSTGRES_DB }}?sslmode=disable"
 
     steps:
       - name: Checkout repository
