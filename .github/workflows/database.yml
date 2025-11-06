@@ -8,7 +8,7 @@ on:
     paths:
       - "backend/migrations/**"
       - "backend/schema.hcl"
-      - ".github/workflows/migrate.yml"
+      - ".github/workflows/database.yml"
 
 jobs:
   migrate-db:

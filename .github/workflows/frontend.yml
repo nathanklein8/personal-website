@@ -11,6 +11,8 @@ on:
       - '**/README.md'
       - '*.example'
       - '.gitignore'
+      - '.github/workflows/backend.yml'
+      - '.github/workflows/database.yml'
 
 jobs:
   build-and-deploy:
