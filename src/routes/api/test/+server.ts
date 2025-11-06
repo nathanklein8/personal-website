@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { API_URL } from '$env/static/private';
 
 export const POST: RequestHandler = async ({ request }) => {
+    console.log('API_URL ' + API_URL)
 	const body = await request.json();
 	const res = await fetch(`${API_URL}/api/test`, {
 		method: 'POST',
