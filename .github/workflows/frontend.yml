@@ -38,6 +38,8 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: app:latest
+          build-args: |
+            API_URL=${{ github.ref_name == 'main' && 'https://nklein.xyz/api' || 'http://atlas:8082' }}
 
       - name: Restart Frontend Service
         run: |
