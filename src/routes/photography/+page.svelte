@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 
-	const API_BASE = 'http://localhost:8123';
+	export const API_URL = import.meta.env.API_URL || 'http://localhost:8123';
 
 	let newNote = '';
 	let incrementId: number | null = null;
@@ -12,7 +12,7 @@
 	// Create a new test item
 	async function handleCreate() {
 		console.log('creating' + newNote);
-		const res = await fetch(`${API_BASE}/api/test`, {
+		const res = await fetch(`${API_URL}/api/test`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ note: newNote })
@@ -33,7 +33,7 @@
 		console.log('incrementing' + incrementId);
 		if (incrementId === null) return;
 
-		const res = await fetch(`${API_BASE}/api/test/${incrementId}/increment`, {
+		const res = await fetch(`${API_URL}/api/test/${incrementId}/increment`, {
 			method: 'POST'
 		});
 
