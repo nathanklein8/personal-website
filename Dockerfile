@@ -1,8 +1,8 @@
 # Build Step
 FROM oven/bun:latest AS builder
 WORKDIR /app
-ARG VITE_API_URL
-RUN echo "VITE_API_URL=${VITE_API_URL}" > .env
+ARG PUBLIC_API_URL
+RUN echo "PUBLIC_API_URL=${PUBLIC_API_URL}" > .env
 COPY bun.lock package.json ./
 RUN bun install --frozen-lockfile
 COPY . .
