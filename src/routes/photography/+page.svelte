@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
+	import { API_URL } from '$env/static/private';
 
-	export const API_URL = import.meta.env.API_URL || 'http://localhost:8123';
+	// export const API_URL = import.meta.env.API_URL || 'http://localhost:8123';
 
 	let newNote = '';
 	let incrementId: number | null = null;
@@ -48,6 +49,8 @@
 </script>
 
 <section class="flex h-screen flex-col items-center justify-center bg-gray-50 gap-6 p-4">
+
+	<div>API URL: {API_URL}</div>
 
 	<div class="flex flex-col items-center gap-2">
 		<h2 class="text-xl font-semibold">Create Test Item</h2>
