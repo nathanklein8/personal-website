@@ -51,7 +51,11 @@ func main() {
 	r := chi.NewRouter()
 	// Basic CORS middleware
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173"}, // svelte dev server
+		AllowedOrigins: []string{
+			"http://localhost:5173", // dev server
+			"http://atlas:2989",     // test server
+			"https://nklein.xyz",    // prod server
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: true,
