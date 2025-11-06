@@ -18,6 +18,7 @@
 	import ProjectCard from '$lib/components/project-card.svelte';
 	import { cn } from '$lib/utils';
 	import { TypeWriter } from 'svelte-typewrite';
+	import { Button } from '$lib/components/ui/button';
 
 	const languages = ['TypeScript', 'Python', 'Java', 'C', 'SQL'];
 	const fullstacktechs = [
@@ -108,7 +109,7 @@
 					<button
 						class={cn(
 							copied ? 'text-muted-foreground' : '',
-							'font-code-wide flex w-full flex-row items-center rounded-lg border-2 bg-background/80 p-3 text-sm'
+							'font-code-wide flex w-full flex-row items-center border-foreground/25 rounded-lg border-1 bg-background/80 p-3 text-sm'
 						)}
 						onclick={copyEmail}
 					>
@@ -169,7 +170,7 @@
 		<div
 			in:fade={{ duration: 1200, easing: expoIn }}
 			out:fade={{ duration: 200 }}
-			class="fixed bottom-0 left-0 mb-6 flex w-full flex-col items-center gap-y-4 text-muted-foreground"
+			class="invisible sm:visible fixed bottom-0 left-0 mb-6 flex w-full flex-col items-center gap-y-4 text-muted-foreground"
 		>
 			<p>Check out what I've done!</p>
 			<CircleArrowDown class="animate-bounce" size={32} />
@@ -213,4 +214,38 @@
 			Actions CI/CD pipeline on my home server.'}
 		image=""
 	/>
+</section>
+
+<section
+	id="featured-photography"
+	class="flex min-h-[75vh] flex-col items-center justify-center gap-y-12 py-16"
+>
+
+	<h1 class="font-code text-center text-lg md:text-3xl">photography blah blah</h1>
+
+	<div class="border-2 border-foreground p-32">
+		placeholder
+	</div>
+
+	<Button>
+		<a href="/photography">See Full Gallery</a>
+	</Button>
+
+</section>
+
+<section
+	id="featured-hikes"
+	class="flex min-h-[75vh] flex-col items-center justify-center gap-y-12 py-16"
+>
+
+	<h1 class="font-code text-center text-lg md:text-3xl">hikes blah blah</h1>
+
+	<div class="border-2 border-foreground p-32">
+		placeholder
+	</div>
+
+	<Button>
+		<a href="/photography">See Hikes </a>
+	</Button>
+
 </section>
