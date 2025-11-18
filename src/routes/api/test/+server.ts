@@ -5,6 +5,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const apiURL = getURL();
 
+	console.log("API_URL: " + apiURL);
+
 	const body = await request.json();
 	const res = await fetch(apiURL + '/api/test', {
 		method: 'POST',
