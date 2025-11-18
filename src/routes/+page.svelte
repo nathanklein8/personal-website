@@ -102,7 +102,7 @@
 								<ArrowUpRight size={20} />
 							</p>
 							<p class="flex max-w-fit items-center gap-0.5 underline-offset-4 hover:underline">
-								<a href={data.landingCard?.linkedin} target="_blank" rel="noopener noreferrer">
+								<a href="https://github.com/nathanklein8" target="_blank" rel="noopener noreferrer">
 									Github
 								</a>
 								<ArrowUpRight size={20} />
