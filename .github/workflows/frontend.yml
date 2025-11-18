@@ -24,7 +24,13 @@ jobs:
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       APP_PORT: ${{ vars.APP_PORT }}
-      API_URL: ${{ github.ref_name == 'main' && 'https://nklein.xyz/api' || 'http://atlas:8082' }}
+
+      # set api URL
+      # for dev, this should be localhost:<backend port>
+      # for test, <backend container name>:<internal port (8080)>
+      # for prod, same as test.  Not sure abt this yet tho
+      API_URL: 'http://backend:8080'
+      
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
 
     steps:
@@ -42,4 +48,4 @@ jobs:
 
       - name: Restart Frontend Service
         run: |
-          docker compose up -d --no-deps --build app
+          docker compose up -d --no-deps app
