@@ -7,7 +7,7 @@
 		SheetHeader,
 		SheetClose
 	} from '$lib/components/ui/sheet';
-	import { Button, buttonVariants } from '$lib/components/ui/button';
+	import { buttonVariants } from '$lib/components/ui/button';
 	import { Menu } from '@lucide/svelte';
 
 	export let visible = false;
@@ -27,7 +27,7 @@
 		<div class="hidden items-center gap-4 sm:flex">
 			<a href="/#projects" class="hover:font-semibold">Projects</a>
 			<a href="/photography" class="hover:font-semibold">Photography</a>
-			<a href="/hikes" class="hover:font-semibold">Hikes</a>
+			<a href="/hiking" class="hover:font-semibold">Hiking</a>
 			<ModeToggle />
 		</div>
 
@@ -53,7 +53,7 @@
 							<a href="/photography" class="hover:underline">Photography</a>
 						</SheetClose>
 						<SheetClose>
-							<a href="/hikes" class="hover:underline">Hikes</a>
+							<a href="/hiking" class="hover:underline">Hiking</a>
 						</SheetClose>
 					</div>
 				</SheetContent>
