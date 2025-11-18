@@ -1,9 +1,6 @@
 # Build Step
 FROM oven/bun:latest AS builder
 WORKDIR /app
-ARG API_URL
-ENV API_URL=$API_URL
-RUN echo "API_URL value at build time: ${API_URL}"
 COPY bun.lock package.json ./
 RUN bun install --frozen-lockfile
 COPY . .

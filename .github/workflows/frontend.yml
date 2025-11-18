@@ -24,6 +24,7 @@ jobs:
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       APP_PORT: ${{ vars.APP_PORT }}
+      API_URL: ${{ github.ref_name == 'main' && 'https://nklein.xyz/api' || 'http://atlas:8082' }}
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
 
     steps:
@@ -38,8 +39,6 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: app:latest
-          build-args: |
-            API_URL=${{ github.ref_name == 'main' && 'https://nklein.xyz/api' || 'http://atlas:8082' }}
 
       - name: Restart Frontend Service
         run: |

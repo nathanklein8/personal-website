@@ -1,11 +1,12 @@
+import { getURL } from '$lib/server/backend';
 import type { RequestHandler } from './$types';
-import { API_URL } from '$env/static/private';
 
 export const POST: RequestHandler = async ({ params }) => {
-    console.log('API_URL ' + API_URL)
-	const { id } = params;
 
-	const res = await fetch(`${API_URL}/api/test/${id}/increment`, {
+	const apiURL = getURL();
+    
+	const { id } = params;
+	const res = await fetch(apiURL + `/api/test/${id}/increment`, {
 		method: 'POST'
 	});
 
