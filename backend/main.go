@@ -18,10 +18,11 @@ type Server struct {
 	db *sql.DB
 }
 
-type TestItem struct {
-	ID    int    `json:"id"`
-	Count int    `json:"count"`
-	Note  string `json:"note"`
+type LandingCard struct {
+	Bio      string     `json:"bio"`
+	Email    string     `json:"email"`
+	Linkedin string     `json:"linkedin"`
+	Skills   [][]string `json:"skills"`
 }
 
 func main() {
@@ -65,11 +66,19 @@ func main() {
 	s := &Server{db: db}
 
 	// Health check endpoint
-	r.Get("/health", s.handleHealth)
+	r.Get("/api/health", s.handleHealth)
 
-	// register connectivity testing endpoints
-	r.Post("/api/test", s.createTestItem)
-	r.Post("/api/test/{id}/increment", s.incrementCount)
+	// register landing card endpoints
+	r.HandleFunc("/api/landingcard", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			s.handleGetLandingCard(w, r)
+		case http.MethodPost, http.MethodPut:
+			s.handleSetLandingCard(w, r)
+		default:
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
 	// Start server
 	addr := ":8080"
@@ -93,49 +102,69 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-// POST /api/test
-// Body: { "note": "optional string" }
-func (s *Server) createTestItem(w http.ResponseWriter, r *http.Request) {
-	var input struct {
-		Note string `json:"note"`
+func (s *Server) handleGetLandingCard(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 1*time.Second)
+	defer cancel()
+
+	row := s.db.QueryRowContext(ctx, `
+        SELECT bio, email, linkedin, skills
+        FROM landing_card
+        WHERE id = 1
+    `)
+
+	var landingCard LandingCard
+	var skillsJSON []byte
+
+	if err := row.Scan(&landingCard.Bio, &landingCard.Email, &landingCard.Linkedin, &skillsJSON); err != nil {
+		http.Error(w, "failed to fetch landing card content", http.StatusInternalServerError)
+		return
 	}
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+
+	if err := json.Unmarshal(skillsJSON, &landingCard.Skills); err != nil {
+		http.Error(w, "invalid skills format in database", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(landingCard)
+}
+
+func (s *Server) handleSetLandingCard(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	var landingCard LandingCard
+	if err := json.NewDecoder(r.Body).Decode(&landingCard); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	var id, count int
-	err := s.db.QueryRow(`INSERT INTO test_items (note) VALUES ($1) RETURNING id, count`, input.Note).Scan(&id, &count)
+	skillsJSON, err := json.Marshal(landingCard.Skills)
 	if err != nil {
-		http.Error(w, "insert failed: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "invalid skills format", http.StatusBadRequest)
 		return
 	}
 
-	resp := map[string]any{"id": id, "count": count, "note": input.Note}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
-}
+	_, err = s.db.ExecContext(ctx, `
+        INSERT INTO landing_card (id, bio, email, linkedin, skills)
+        VALUES (1, $1, $2, $3, $4)
+        ON CONFLICT (id)
+        DO UPDATE SET
+          bio = EXCLUDED.bio,
+          email = EXCLUDED.email,
+          linkedin = EXCLUDED.linkedin,
+          skills = EXCLUDED.skills
+    `,
+		landingCard.Bio,
+		landingCard.Email,
+		landingCard.Linkedin,
+		skillsJSON,
+	)
 
-// POST /api/test/{id}/increment
-func (s *Server) incrementCount(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	_, err := s.db.Exec(`UPDATE test_items SET count = count + 1 WHERE id = $1`, id)
 	if err != nil {
-		http.Error(w, "update failed: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "failed to update landing card info", http.StatusInternalServerError)
 		return
 	}
 
-	var updated struct {
-		ID    int    `json:"id"`
-		Count int    `json:"count"`
-		Note  string `json:"note"`
-	}
-	err = s.db.QueryRow(`SELECT id, count, note FROM test_items WHERE id = $1`, id).Scan(&updated.ID, &updated.Count, &updated.Note)
-	if err != nil {
-		http.Error(w, "fetch failed: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(updated)
+	w.WriteHeader(http.StatusNoContent)
 }

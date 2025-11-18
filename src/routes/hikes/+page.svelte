@@ -1,4 +1,4 @@
-<section class="flex h-screen flex-col items-center justify-center bg-gray-50">
+<section class="flex h-screen flex-col items-center justify-center">
 	<h1>Hikes</h1>
-	<p class="text-xl text-gray-700 mb-8">Under Construction</p>
+	<p class="text-xl">Under Construction</p>
 </section>

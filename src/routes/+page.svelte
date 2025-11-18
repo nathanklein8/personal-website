@@ -19,22 +19,12 @@
 	import { cn } from '$lib/utils';
 	import { TypeWriter } from 'svelte-typewrite';
 	import { Button } from '$lib/components/ui/button';
+	import type { PageProps } from './$types';
 
-	const languages = ['TypeScript', 'Python', 'Java', 'C', 'SQL'];
-	const fullstacktechs = [
-		'React',
-		'Svelte',
-		'Prisma',
-		'drizzle',
-		'PostgreSQL',
-		'Docker',
-		'tailwindCSS',
-		'shadcn/ui'
-	];
-	const mltechs = ['Pytorch', 'scikit-learn', 'mlflow'];
+	let { data }: PageProps = $props();
 
-	let showScrollIcon = false;
-	let copied = false;
+	let showScrollIcon = $state(false);
+	let copied = $state(false);
 
 	onMount(() => {
 		const isMobile: boolean = Device.isPhone || Device.isTablet;
@@ -70,7 +60,7 @@
 
 <section
 	id="landing"
-	class="flex min-h-screen flex-col items-center gap-y-8 bg-gradient-to-b from-green-700 to-background to-55% md:to-70% pt-24 sm:pt-32"
+	class="flex min-h-screen flex-col items-center gap-y-8 bg-gradient-to-b from-green-700 to-background to-55% pt-24 sm:pt-32 md:to-70%"
 >
 	<div class="mx-auto max-w-4xl space-y-8">
 		<div class="space-y-4 text-center">
@@ -86,6 +76,7 @@
 		</div>
 	</div>
 
+	{#if data.landingCard}
 	<Card class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]">
 		<CardContent class="grid gap-6 sm:grid-cols-2">
 			<div class="space-y-4">
@@ -94,9 +85,7 @@
 					About Me
 				</h1>
 				<p>
-					I am a Senior at RIT studying Computer Science. I have internship experience in software
-					engineering and machine learning. In my free time I enjoy hiking, photography, and playing
-					volleyball!
+					{data.landingCard.bio}
 				</p>
 			</div>
 
@@ -109,11 +98,11 @@
 					<button
 						class={cn(
 							copied ? 'text-muted-foreground' : '',
-							'font-code-wide flex w-full flex-row items-center border-foreground/25 rounded-lg border-1 bg-background/80 p-3 text-sm'
+							'font-code-wide flex w-full flex-row items-center rounded-lg border-1 border-foreground/25 bg-background/80 p-3 text-sm'
 						)}
 						onclick={copyEmail}
 					>
-						$ neklein3@gmail.com
+						$ {data.landingCard.email}
 						<span class="flex grow"></span>
 						{#if copied}
 							<ClipboardCheck size={20} />
@@ -124,7 +113,7 @@
 					<p class="flex max-w-fit items-center gap-1 underline-offset-4 hover:underline">
 						<a
 							class="flex items-center gap-0.5"
-							href="https://www.linkedin.com/in/neklein"
+							href={data.landingCard?.linkedin}
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -141,36 +130,25 @@
 					<BookOpenCheck size={22} />
 					I have experience with
 				</h1>
-				<div class="flex flex-wrap gap-2">
-					{#each languages as lang}
-						<Badge variant="outline">
-							{lang}
-						</Badge>
-					{/each}
-				</div>
-				<div class="flex flex-wrap gap-2">
-					{#each fullstacktechs as thing}
-						<Badge variant="secondary">
-							{thing}
-						</Badge>
-					{/each}
-				</div>
-				<div class="flex flex-wrap gap-2">
-					{#each mltechs as thing}
-						<Badge variant="outline">
-							{thing}
-						</Badge>
-					{/each}
-				</div>
+				{#each data.landingCard.skills as skillClass, i}
+					<div class="flex flex-wrap gap-2">
+						{#each skillClass as skill}
+							<Badge variant={i % 2 === 0 ? "outline" : "secondary"}>
+								{skill}
+							</Badge>
+						{/each}
+					</div>
+				{/each}
 			</div>
 		</CardFooter>
 	</Card>
+	{/if}
 
 	{#if showScrollIcon}
 		<div
 			in:fade={{ duration: 1200, easing: expoIn }}
 			out:fade={{ duration: 200 }}
-			class="invisible sm:visible fixed bottom-0 left-0 mb-6 flex w-full flex-col items-center gap-y-4 text-muted-foreground"
+			class="invisible fixed bottom-0 left-0 mb-6 flex w-full flex-col items-center gap-y-4 text-muted-foreground sm:visible"
 		>
 			<p>Check out what I've done!</p>
 			<CircleArrowDown class="animate-bounce" size={32} />
@@ -220,32 +198,24 @@
 	id="featured-photography"
 	class="flex min-h-[75vh] flex-col items-center justify-center gap-y-12 py-16"
 >
-
 	<h1 class="font-code text-center text-lg md:text-3xl">photography blah blah</h1>
 
-	<div class="border-2 border-foreground p-32">
-		placeholder
-	</div>
+	<div class="border-2 border-foreground p-32">placeholder</div>
 
 	<Button>
 		<a href="/photography">See Full Gallery</a>
 	</Button>
-
 </section>
 
 <section
 	id="featured-hikes"
 	class="flex min-h-[75vh] flex-col items-center justify-center gap-y-12 py-16"
 >
-
 	<h1 class="font-code text-center text-lg md:text-3xl">hikes blah blah</h1>
 
-	<div class="border-2 border-foreground p-32">
-		placeholder
-	</div>
+	<div class="border-2 border-foreground p-32">placeholder</div>
 
 	<Button>
 		<a href="/photography">See Hikes </a>
 	</Button>
-
 </section>

@@ -12,7 +12,9 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"db:start": "docker compose up -d db"
+		"db:start": "docker compose up -d db",
+		"db:diff": "atlas migrate diff --dir \"file://backend/migrations\" --to \"file://backend/schema.hcl\" --dev-url \"docker://postgres/18/dev\"",
+		"db:apply": "source .env && DATABASE_URL=${DATABASE_URL} migrate apply --dir \"file://backend/migrations\" --url ${DATABASE_URL}"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
