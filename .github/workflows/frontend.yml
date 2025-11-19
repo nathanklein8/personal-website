@@ -23,6 +23,8 @@ jobs:
 
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
+
       APP_PORT: ${{ vars.APP_PORT }}
 
       # set api URL
@@ -31,8 +33,6 @@ jobs:
       # for prod, same as test.  Not sure abt this yet tho
       API_URL: 'http://backend:8080'
       
-      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
-
     steps:
       - uses: actions/checkout@v4
 

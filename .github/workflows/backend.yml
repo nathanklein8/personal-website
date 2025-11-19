@@ -19,8 +19,9 @@ jobs:
 
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
-      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
+      
+      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
 
       # postgres vars required by compose file to make DATABASE_URL
       POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
