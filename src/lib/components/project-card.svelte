@@ -65,9 +65,7 @@
 				class="aspect-square max-w-full rounded-lg object-cover sm:max-w-full"
 			/>
 		{/if}
-		<p class="text-md text-muted-foreground">
-			{@html highlightedDescription}
-		</p>
+		<p>{@html highlightedDescription}</p>
 	</CardContent>
 	<CardFooter class="flex flex-wrap gap-2 border-t">
 		{#each technologies as tech}
