@@ -49,3 +49,7 @@ jobs:
       - name: Restart Frontend Service
         run: |
           docker compose up -d --no-deps --build app
+
+      - name: (prod) Connect to Proxy Network
+        if: env.ENV == 'prod'
+        run: docker network connect nathan_default pwsite-prod-app

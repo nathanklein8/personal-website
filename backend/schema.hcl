@@ -14,6 +14,10 @@ table "landing_card" {
   column "linkedin" {
     type = text
   }
+  column "github" {
+    type = text
+    null = true
+  }
   column "skills" {
     type = jsonb
   }

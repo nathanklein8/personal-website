@@ -16,6 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
                 bio: json.bio,
                 email: json.email,
                 linkedin: json.linkedin,
+                github: json.github,
                 skills: json.skills,
             }
         };

@@ -60,15 +60,15 @@
 
 <section
 	id="landing"
-	class="flex min-h-screen flex-col justify-center items-center gap-y-16 bg-gradient-to-b from-green-700 to-background to-55% py-12 pt-24 sm:pt-32 md:to-70%"
+	class="flex min-h-screen flex-col justify-center items-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pb-12 pt-24 md:to-70%"
 >
-	<div class="space-y-8">
+	<div class="space-y-12">
 		<div class="space-y-4 flex flex-col items-center">
 			<!-- <div class="h-48 w-48 overflow-hidden rounded-full border-4 border-stone-100 shadow-xl">
 				<img src="/me.jpg" alt="me" />
 			</div> -->
-			<h1 class="font-code text-3xl md:text-4xl">Hi! I'm Nathan</h1>
-			<h2 class="text-xl md:text-2xl text-primary/80">
+			<h1 class="font-code text-3xl sm:text-4xl">Hi! I'm Nathan</h1>
+			<h2 class="text-xl sm:text-2xl">
 				<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
 			</h2>
 		</div>
@@ -157,7 +157,7 @@
 	{/if}
 </section>
 
-<section id="projects" class="flex min-h-screen flex-col items-center justify-center gap-y-8 py-12">
+<section id="projects" class="flex min-h-screen flex-col items-center justify-center gap-y-8 py-16">
 	<h1 class="font-code text-center text-lg md:text-3xl">Some projects I've worked on...</h1>
 
 	<ProjectCard
@@ -194,11 +194,11 @@
 
 <section
 	id="featured-photography"
-	class="flex min-h-[75vh] flex-col items-center justify-center gap-y-12 bg-secondary py-16"
+	class="flex min-h-[85vh] flex-col items-center justify-center gap-y-12 bg-secondary py-16"
 >
 	<h1 class="font-code text-center text-lg md:text-3xl">Photography</h1>
 
-	<div class="border-2 border-foreground bg-background p-32">under construction</div>
+	<div class="border-2 border-foreground bg-background p-24 lg:p-32 text-center">under construction</div>
 
 	<Button>
 		<a href="/photography">My Full Gallery</a>
@@ -207,11 +207,11 @@
 
 <section
 	id="featured-hike"
-	class="flex min-h-[75vh] flex-col items-center justify-center gap-y-12 py-16"
+	class="flex min-h-[85vh] flex-col items-center justify-center gap-y-12 py-16"
 >
 	<h1 class="font-code text-center text-lg md:text-3xl">Hiking</h1>
 
-	<div class="border-2 border-foreground bg-background p-32">under construction</div>
+	<div class="border-2 border-foreground bg-background p-24 lg:p-32 text-center">under construction</div>
 
 	<Button>
 		<a href="/photography">Places I've Gone</a>
