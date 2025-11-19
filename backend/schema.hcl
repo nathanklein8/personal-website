@@ -16,7 +16,6 @@ table "landing_card" {
   }
   column "github" {
     type = text
-    null = true
   }
   column "skills" {
     type = jsonb
