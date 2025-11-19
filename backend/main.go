@@ -22,6 +22,7 @@ type LandingCard struct {
 	Bio      string     `json:"bio"`
 	Email    string     `json:"email"`
 	Linkedin string     `json:"linkedin"`
+	Github   string     `json:"github"`
 	Skills   [][]string `json:"skills"`
 }
 
@@ -107,7 +108,7 @@ func (s *Server) handleGetLandingCard(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	row := s.db.QueryRowContext(ctx, `
-        SELECT bio, email, linkedin, skills
+        SELECT bio, email, linkedin, github, skills
         FROM landing_card
         WHERE id = 1
     `)
@@ -115,7 +116,7 @@ func (s *Server) handleGetLandingCard(w http.ResponseWriter, r *http.Request) {
 	var landingCard LandingCard
 	var skillsJSON []byte
 
-	if err := row.Scan(&landingCard.Bio, &landingCard.Email, &landingCard.Linkedin, &skillsJSON); err != nil {
+	if err := row.Scan(&landingCard.Bio, &landingCard.Email, &landingCard.Linkedin, &landingCard.Github, &skillsJSON); err != nil {
 		http.Error(w, "failed to fetch landing card content", http.StatusInternalServerError)
 		return
 	}
@@ -146,18 +147,20 @@ func (s *Server) handleSetLandingCard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = s.db.ExecContext(ctx, `
-        INSERT INTO landing_card (id, bio, email, linkedin, skills)
-        VALUES (1, $1, $2, $3, $4)
+        INSERT INTO landing_card (id, bio, email, linkedin, github, skills)
+        VALUES (1, $1, $2, $3, $4, $5)
         ON CONFLICT (id)
         DO UPDATE SET
           bio = EXCLUDED.bio,
           email = EXCLUDED.email,
           linkedin = EXCLUDED.linkedin,
+		  github = EXCLUDED.github,
           skills = EXCLUDED.skills
     `,
 		landingCard.Bio,
 		landingCard.Email,
 		landingCard.Linkedin,
+		landingCard.Github,
 		skillsJSON,
 	)
 
