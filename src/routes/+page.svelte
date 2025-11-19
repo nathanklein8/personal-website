@@ -49,7 +49,7 @@
 
 	async function copyEmail() {
 		try {
-			await navigator.clipboard.writeText('neklein3@gmail.com');
+			await navigator.clipboard.writeText(data.landingCard?.email);
 			copied = true;
 			setTimeout(() => (copied = false), 3000);
 		} catch (e) {
