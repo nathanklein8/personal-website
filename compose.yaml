@@ -1,5 +1,28 @@
 # compose.yaml
 services:
+  
+  app:
+    container_name: pwsite-${ENV}-app
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT}:3000"
+    environment:
+      - API_URL=${API_URL}
+      - TZ=America/New_York
+    depends_on:
+      - backend
+
+  backend:
+    container_name: pwsite-${ENV}-backend
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT}:8080"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
 
   db:
     container_name: pwsite-${ENV}-db
@@ -15,19 +38,6 @@ services:
     volumes:
       - db-data:/var/lib/postgresql
 
-  app:
-    container_name: pwsite-${ENV}-app
-    build: .
-    restart: unless-stopped
-    ports:
-      - "${APP_PORT}:3000"
-    environment:
-      - ENV=${ENV}
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - TZ=America/New_York
-    depends_on:
-      - db
-
 networks:
   default:
     name: pwsite-${ENV}-net
@@ -35,4 +45,3 @@ networks:
 volumes:
   db-data:
     name: pwsite-${ENV}-db-data
-

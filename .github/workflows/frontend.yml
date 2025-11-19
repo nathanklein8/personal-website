@@ -1,0 +1,51 @@
+name: Build & Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main # prod
+      - test
+    paths-ignore:
+      - 'backend/**'
+      - 'README.md'
+      - '**/README.md'
+      - '*.example'
+      - '.gitignore'
+      - '.github/workflows/backend.yml'
+      - '.github/workflows/database.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    # set which env to pull secrets/vars from
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+
+    env:
+      ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+      APP_PORT: ${{ vars.APP_PORT }}
+
+      # set api URL
+      # for dev, this should be localhost:<backend port>
+      # for test, <backend container name>:<internal port (8080)>
+      # for prod, same as test.  Not sure abt this yet tho
+      API_URL: 'http://backend:8080'
+      
+      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: app:latest
+
+      - name: Restart Frontend Service
+        run: |
+          docker compose up -d --no-deps --build app
