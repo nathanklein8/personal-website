@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async () => {
 
     const apiURL = getURL();
-    const endpoint = apiURL + '/api/landinggard'
+    const endpoint = apiURL + '/api/landingcard'
 
     let res: Response;
 
@@ -43,5 +43,5 @@ export const load: PageServerLoad = async () => {
             skills: json.skills,
         }
     };
-    
+
 };
