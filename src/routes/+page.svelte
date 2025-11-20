@@ -45,7 +45,7 @@
 		<!-- <div class="h-48 w-48 overflow-hidden rounded-full border-4 border-stone-100 shadow-xl">
 				<img src="/me.jpg" alt="me" />
 			</div> -->
-		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan</h1>
+		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan wtf</h1>
 		<h2 class="text-lg sm:text-xl">
 			<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
 		</h2>
@@ -80,7 +80,7 @@
 	{/if}
 </section>
 
-<section id="projects" class="flex flex-col items-center justify-center gap-y-12 py-12">
+<section id="projects" class="flex flex-col min-h-screen items-center justify-center gap-y-12 py-12">
 	<h1 class="font-code mx-3 max-w-2xl text-center text-lg sm:text-xl">
 		Some projects I've worked on...
 	</h1>
