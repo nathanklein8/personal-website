@@ -37,23 +37,18 @@
 	}
 </script>
 
-<Card class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]">
-	<CardTitle class="font-code flex flex-row flex-wrap items-center gap-2 px-6 text-lg sm:text-xl">
+<Card class="mx-3 max-w-3xl shadow-lg">
+	<CardTitle
+		class="font-code flex min-h-8 flex-row flex-wrap items-center justify-between gap-2 px-6 text-lg sm:text-xl"
+	>
 		<h1 class="flex items-center gap-2 font-normal text-wrap">
-			<svelte:component this={IconComponent} size={22} />
+			<svelte:component this={IconComponent} size={22} class="mb-0.5" />
 			{title}
 		</h1>
+		<!-- show a 'Try it!' button when a deployment link is passed -->
 		{#if deploymentLink != ''}
-			<span class="flex grow"></span>
-			<Button variant="green">
-				<a
-					class="font-code text-md md:text-lg"
-					href={deploymentLink}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Try it!
-				</a>
+			<Button size="sm" class="font-code">
+				<a href={deploymentLink} target="_blank" rel="noopener noreferrer"> Try it! </a>
 			</Button>
 		{/if}
 	</CardTitle>

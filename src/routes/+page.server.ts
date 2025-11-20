@@ -1,6 +1,14 @@
 import { getURL } from '$lib/server/backend';
 import type { PageServerLoad } from './$types';
 
+function handleError(message: string): any {
+    return {
+        landingCard: {
+            error: message
+        }
+    };
+}
+
 export const load: PageServerLoad = async () => {
 
     const apiURL = getURL();
@@ -11,8 +19,8 @@ export const load: PageServerLoad = async () => {
     try {
         res = await fetch(endpoint);
     } catch (err) {
-        console.error(`Failed to reach backend at ${endpoint}`, err);
-        return;
+        console.error(`Unable to reach backend`, err);
+        return handleError("Unable to reach backend")
     }
 
     if (!res.ok) {
@@ -22,7 +30,8 @@ export const load: PageServerLoad = async () => {
         } catch {
             bodyText = "<unreadable>";
         }
-        console.error(`Backend returned HTTP ${res.status}: ${res.statusText}\nBody: ${bodyText}`);
+        console.error(`HTTP ${res.status}: ${res.statusText}, Body: ${bodyText}`);
+        return handleError(`HTTP ${res.status}: ${res.statusText}, Body: ${bodyText}`)
     }
 
     let json: any;
@@ -31,9 +40,10 @@ export const load: PageServerLoad = async () => {
         json = await res.json();
     } catch (err) {
         console.error("Backend returned non-JSON response", err);
-        return;
+        return handleError("Backend returned non-JSON response")
     }
 
+    // no error happened, return a json struct to the ui
     return {
         landingCard: {
             bio: json.bio,

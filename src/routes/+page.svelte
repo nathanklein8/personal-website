@@ -1,31 +1,19 @@
 <script lang="ts">
-	import { Badge } from '$lib/components/ui/badge';
-	import { Card, CardContent } from '$lib/components/ui/card';
-	import CardFooter from '$lib/components/ui/card/card-footer.svelte';
-	import {
-		ArrowUpRight,
-		BadgeQuestionMark,
-		BookOpenCheck,
-		CircleArrowDown,
-		Clipboard,
-		ClipboardCheck,
-		Github,
-		MessageCircle
-	} from '@lucide/svelte';
+	import { ArrowUpRight, CircleArrowDown } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 	import { expoIn } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
 	import Device from 'svelte-device-info';
 	import ProjectCard from '$lib/components/project-card.svelte';
-	import { cn } from '$lib/utils';
 	import { TypeWriter } from 'svelte-typewrite';
 	import { Button } from '$lib/components/ui/button';
 	import type { PageProps } from './$types';
+	import ErrorCard from '$lib/components/error-card.svelte';
+	import LandingCard from '$lib/components/landing-card.svelte';
 
 	let { data }: PageProps = $props();
 
 	let showScrollIcon = $state(false);
-	let copied = $state(false);
 
 	onMount(() => {
 		const isMobile: boolean = Device.isPhone || Device.isTablet;
@@ -46,105 +34,40 @@
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	});
-
-	async function copyEmail() {
-		try {
-			await navigator.clipboard.writeText(data.landingCard?.email);
-			copied = true;
-			setTimeout(() => (copied = false), 3000);
-		} catch (e) {
-			console.error('Clipboard write failed', e);
-		}
-	}
 </script>
 
 <section
 	id="landing"
-	class="flex min-h-screen flex-col justify-center items-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pb-12 pt-24 md:to-70%"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
 >
-	<div class="space-y-12">
-		<div class="space-y-4 flex flex-col items-center">
-			<!-- <div class="h-48 w-48 overflow-hidden rounded-full border-4 border-stone-100 shadow-xl">
+	<!-- heading that displays my name and a typewriter effect tagline -->
+	<div class="font-code flex flex-col items-center space-y-4">
+		<!-- <div class="h-48 w-48 overflow-hidden rounded-full border-4 border-stone-100 shadow-xl">
 				<img src="/me.jpg" alt="me" />
 			</div> -->
-			<h1 class="font-code text-3xl sm:text-4xl">Hi! I'm Nathan</h1>
-			<h2 class="text-xl sm:text-2xl">
-				<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
-			</h2>
-		</div>
+		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan</h1>
+		<h2 class="text-lg sm:text-xl">
+			<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
+		</h2>
 	</div>
 
-	{#if data.landingCard}
-		<Card class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]">
-			<CardContent class="grid gap-6 sm:grid-cols-2">
-				<div class="space-y-4">
-					<h1 class="font-code flex items-center gap-2 text-xl">
-						<BadgeQuestionMark size={24} />
-						About Me
-					</h1>
-					<p>
-						{data.landingCard.bio}
-					</p>
-				</div>
-
-				<div class="space-y-4">
-					<h1 class="font-code flex items-start gap-2 text-xl">
-						<MessageCircle size={24} />
-						Connect
-					</h1>
-					<div class="space-y-3">
-						<div class="flex flex-row gap-4">
-							<p class="flex max-w-fit items-center gap-0.5 underline-offset-4 hover:underline">
-								<a href={data.landingCard?.linkedin} target="_blank" rel="noopener noreferrer">
-									LinkedIn
-								</a>
-								<ArrowUpRight size={20} />
-							</p>
-							<p class="flex max-w-fit items-center gap-0.5 underline-offset-4 hover:underline">
-								<a href={data.landingCard?.github} target="_blank" rel="noopener noreferrer">
-									Github
-								</a>
-								<ArrowUpRight size={20} />
-							</p>
-						</div>
-						<button
-							class={cn(
-								copied ? 'text-muted-foreground' : '',
-								'font-code-wide flex w-full flex-row items-center rounded-lg border-1 border-foreground/25 bg-background/80 p-3 text-sm'
-							)}
-							onclick={copyEmail}
-						>
-							$ {data.landingCard.email}
-							<span class="flex grow"></span>
-							{#if copied}
-								<ClipboardCheck size={20} />
-							{:else}
-								<Clipboard size={20} />
-							{/if}
-						</button>
-					</div>
-				</div>
-			</CardContent>
-			<CardFooter class="border-t">
-				<div class="flex flex-col gap-3">
-					<h1 class="font-code flex items-center gap-2 text-xl">
-						<BookOpenCheck size={24} />
-						I have experience with
-					</h1>
-					{#each data.landingCard.skills as skillClass, i}
-						<div class="flex flex-wrap gap-2">
-							{#each skillClass as skill}
-								<Badge variant={i % 2 === 0 ? 'outline' : 'secondary'}>
-									{skill}
-								</Badge>
-							{/each}
-						</div>
-					{/each}
-				</div>
-			</CardFooter>
-		</Card>
+	<!-- display landing 'about me' card, when data is present, and there is no error field on the json -->
+	{#if data.landingCard && !data.landingCard.error}
+		<LandingCard
+			bio={data.landingCard.bio}
+			email={data.landingCard.email}
+			linkedin={data.landingCard.linkedin}
+			github={data.landingCard.github}
+			skills={data.landingCard.skills}
+		/>
 	{/if}
 
+	<!-- display an error alert if there is an error field on the landing card json -->
+	{#if data.landingCard.error}
+		<ErrorCard description={data.landingCard.error} />
+	{/if}
+
+  <!-- show a little fixed position hint scroll -->
 	{#if showScrollIcon}
 		<div
 			in:fade={{ duration: 1200, easing: expoIn }}
@@ -157,8 +80,10 @@
 	{/if}
 </section>
 
-<section id="projects" class="flex min-h-screen flex-col items-center justify-center gap-y-8 py-16">
-	<h1 class="font-code text-center text-lg md:text-3xl">Some projects I've worked on...</h1>
+<section id="projects" class="flex min-h-screen flex-col items-center justify-center gap-y-8">
+	<h1 class="font-code mx-3 max-w-2xl text-center text-lg sm:text-xl">
+		Some projects I've worked on...
+	</h1>
 
 	<ProjectCard
 		icon="Puzzle"
@@ -184,23 +109,41 @@
 	<ProjectCard
 		icon="Globe"
 		title="This Website!"
-		technologies={['Svelte', 'Typescript', 'drizzle', 'PostgreSQL', 'tailwindCSS', 'Docker']}
-		description={'Svelte application fed with data from a PostgreSQL database via drizzle, \
+		technologies={['Svelte', 'Typescript', 'Go', 'PostgreSQL', 'tailwindCSS', 'Docker']}
+		description={'Svelte application fed with data from a PostgreSQL database via a GoLang backend, \
 			to allow for dynamic content changes without redeployment.  Deployed with Github \
 			Actions CI/CD pipeline on my home server.'}
 		image=""
 	/>
+
+	<h1 class="font-code mx-3 max-w-2xl pt-4 text-center text-lg text-balance sm:text-xl">
+		All of my source code & more projects are on
+		<span class="underline-offset-4 hover:underline">
+			<a
+				class="inline-flex items-center gap-0.5"
+				href={data.landingCard?.github}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Github <ArrowUpRight size={22} class="mb-0.5" />
+			</a>
+		</span>
+	</h1>
 </section>
 
 <section
 	id="featured-photography"
 	class="flex min-h-[85vh] flex-col items-center justify-center gap-y-12 bg-secondary py-16"
 >
-	<h1 class="font-code text-center text-lg md:text-3xl">Photography</h1>
+	<h1 class="font-code text-center text-lg sm:text-xl">Photography</h1>
 
-	<div class="border-2 border-foreground bg-background p-24 lg:p-32 text-center">under construction</div>
+	<div
+		class="border-2 border-foreground bg-background p-24 text-center text-muted-foreground lg:p-32"
+	>
+		under construction...
+	</div>
 
-	<Button>
+	<Button class="font-code">
 		<a href="/photography">My Full Gallery</a>
 	</Button>
 </section>
@@ -209,17 +152,19 @@
 	id="featured-hike"
 	class="flex min-h-[85vh] flex-col items-center justify-center gap-y-12 py-16"
 >
-	<h1 class="font-code text-center text-lg md:text-3xl">Hiking</h1>
+	<h1 class="font-code text-center text-lg sm:text-xl">Hiking</h1>
 
-	<div class="border-2 border-foreground bg-background p-24 lg:p-32 text-center">under construction</div>
+	<div
+		class="border-2 border-foreground bg-background p-24 text-center text-muted-foreground lg:p-32"
+	>
+		under construction...
+	</div>
 
-	<Button>
+	<Button class="font-code">
 		<a href="/photography">Places I've Gone</a>
 	</Button>
 </section>
 
-<section id="footer" class="h-16 bg-secondary flex flex-col justify-center">
-	<p class="text-muted-foreground text-center italic">
-		Created by Nathan Klein
-	</p>
+<section id="footer" class="flex h-16 flex-col justify-center bg-secondary">
+	<p class="text-center text-muted-foreground italic">Created by Nathan Klein</p>
 </section>
