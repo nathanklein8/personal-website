@@ -55,6 +55,11 @@ func handleGetLandingCard(s *server.Server, w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	if err := json.Unmarshal(skillsJSON, &lc.Skills); err != nil {
+		http.Error(w, "invalid skills format", http.StatusInternalServerError)
+		return
+	}
+
 	json.NewEncoder(w).Encode(lc)
 }
 

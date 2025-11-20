@@ -67,7 +67,7 @@
 		<ErrorCard description={data.landingCard.error} />
 	{/if}
 
-  <!-- show a little fixed position hint scroll -->
+	<!-- show a little fixed position hint scroll -->
 	{#if showScrollIcon}
 		<div
 			in:fade={{ duration: 1200, easing: expoIn }}
@@ -80,43 +80,45 @@
 	{/if}
 </section>
 
-<section id="projects" class="flex min-h-screen flex-col items-center justify-center gap-y-8">
+<section id="projects" class="flex flex-col items-center justify-center gap-y-12 py-12">
 	<h1 class="font-code mx-3 max-w-2xl text-center text-lg sm:text-xl">
 		Some projects I've worked on...
 	</h1>
 
-	<ProjectCard
-		icon="Puzzle"
-		title="Hangman Web App"
-		deploymentLink="https://app.nklein.xyz"
-		technologies={[
-			'React',
-			'Next.js',
-			'TypeScript',
-			'Prisma',
-			'PostgreSQL',
-			'tailwindCSS',
-			'Docker'
-		]}
-		description={'Full-stack word-guessing game built with \
+	<div class="flex flex-col gap-y-8">
+		<ProjectCard
+			icon="Puzzle"
+			title="Hangman Web App"
+			deploymentLink="https://app.nklein.xyz"
+			technologies={[
+				'React',
+				'Next.js',
+				'TypeScript',
+				'Prisma',
+				'PostgreSQL',
+				'tailwindCSS',
+				'Docker'
+			]}
+			description={'Full-stack word-guessing game built with \
 			React, Prisma, and PostgreSQL. It features a daily global \
 			challenge word and player statistics, all managed server-side for consistent gameplay across \
 			users. The application is self-hosted on my home server for complete control over deployment \
 			and data.'}
-		image="/hangman.jpg"
-	/>
+			image="/hangman.jpg"
+		/>
 
-	<ProjectCard
-		icon="Globe"
-		title="This Website!"
-		technologies={['Svelte', 'Typescript', 'Go', 'PostgreSQL', 'tailwindCSS', 'Docker']}
-		description={'Svelte application fed with data from a PostgreSQL database via a GoLang backend, \
+		<ProjectCard
+			icon="Globe"
+			title="This Website!"
+			technologies={['Svelte', 'Typescript', 'Go', 'PostgreSQL', 'tailwindCSS', 'Docker']}
+			description={'Svelte application fed with data from a PostgreSQL database via a GoLang backend, \
 			to allow for dynamic content changes without redeployment.  Deployed with Github \
 			Actions CI/CD pipeline on my home server.'}
-		image=""
-	/>
+			image=""
+		/>
+	</div>
 
-	<h1 class="font-code mx-3 max-w-2xl pt-4 text-center text-lg text-balance sm:text-xl">
+	<h1 class="font-code mx-3 max-w-2xl text-center text-lg text-balance sm:text-xl">
 		All of my source code & more projects are on
 		<span class="underline-offset-4 hover:underline">
 			<a
@@ -125,7 +127,7 @@
 				target="_blank"
 				rel="noopener noreferrer"
 			>
-				Github <ArrowUpRight size={22} class="mb-0.5" />
+				Github <ArrowUpRight size={24} class="mb-0.5" />
 			</a>
 		</span>
 	</h1>
