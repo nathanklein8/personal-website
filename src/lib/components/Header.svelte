@@ -14,7 +14,7 @@
 </script>
 
 <header
-	class="font-code fixed top-0 left-0 flex h-12 w-full flex-col justify-center bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-500 sm:h-16 dark:bg-black/70"
+	class="font-code fixed top-0 z-1 left-0 flex h-12 w-full flex-col justify-center bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-500 sm:h-16 dark:bg-black/70"
 	class:opacity-0={!visible}
 	class:pointer-events-none={!visible}
 >

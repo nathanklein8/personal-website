@@ -31,9 +31,8 @@ func main() {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{
-			"http://localhost:5173",
-			"http://atlas:2989",
-			"https://nklein.xyz",
+			"http://localhost:5173", // dev env (not docker)
+			"http://app:3000",       // local docker hostname + internal port
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
@@ -44,6 +43,7 @@ func main() {
 	// Mount grouped routes
 	r.Mount("/api", routes.HealthRoutes(s))
 	r.Mount("/api/landingcard", routes.LandingCardRoutes(s))
+	r.Mount("/api/projects", routes.ProjectRoutes(s))
 
 	addr := ":8080"
 	fmt.Printf("🚀 Starting server on %s\n", addr)

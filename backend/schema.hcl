@@ -24,3 +24,42 @@ table "landing_card" {
     columns = [column.id]
   }
 }
+
+table "projects" {
+  schema = schema.public
+  column "id" {
+    type = serial
+  }
+  column "icon" {
+    type = text
+    null = false
+  }
+  column "title" {
+    type = text
+    null = false
+  }
+  column "description" {
+    type = text
+    null = false
+  }
+  column "technologies" {
+    type = text
+    null = false
+    // store technologies as json text ex: ["a", "b"]
+  }
+  column "deployment_link" {
+    type = text
+    null = true
+  }
+  column "image" {
+    type = text
+    null = true
+  }
+  column "alt_text" {
+    type = text
+    null = true
+  }
+  primary_key {
+    columns = [column.id]
+  }
+}

@@ -53,13 +53,7 @@
 
 	<!-- display landing 'about me' card, when data is present, and there is no error field on the json -->
 	{#if data.landingCard && !data.landingCard.error}
-		<LandingCard
-			bio={data.landingCard.bio}
-			email={data.landingCard.email}
-			linkedin={data.landingCard.linkedin}
-			github={data.landingCard.github}
-			skills={data.landingCard.skills}
-		/>
+		<LandingCard {...data.landingCard} />
 	{/if}
 
 	<!-- display an error alert if there is an error field on the landing card json -->
@@ -88,36 +82,11 @@
 		Some projects I've worked on...
 	</h1>
 
+	<!-- display list of project cards, in the order returned by -->
 	<div class="flex flex-col gap-y-8">
-		<ProjectCard
-			icon="Puzzle"
-			title="Hangman Web App"
-			description={'Full-stack word-guessing game built with \
-			React, Prisma, and PostgreSQL. It features a daily global \
-			challenge word and player statistics, all managed server-side for consistent gameplay across \
-			users. The application is self-hosted on my home server for complete control over deployment \
-			and data.'}
-			technologies={[
-				'React',
-				'Next.js',
-				'TypeScript',
-				'Prisma',
-				'PostgreSQL',
-				'tailwindCSS',
-				'Docker'
-			]}
-			image="/hangman.jpg"
-			deploymentLink="https://app.nklein.xyz"
-		/>
-
-		<ProjectCard
-			icon="Globe"
-			title="This Website!"
-			description={'Svelte C C++ C application fed with data from a PostgreSQL database via a GoLang backend, \
-			to allow for dynamic content changes without redeployment.  Deployed with Github \
-			Actions CI/CD pipeline on my home server.'}
-      technologies={['Svelte', 'C', 'Typescript', 'Go', 'PostgreSQL', 'tailwindCSS', 'Docker']}
-		/>
+		{#each data.projects as proj}
+			<ProjectCard {...proj} />
+		{/each}
 	</div>
 
 	<h1 class="font-code mx-3 max-w-2xl text-center text-lg text-balance sm:text-xl">

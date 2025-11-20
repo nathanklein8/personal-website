@@ -1,57 +1,66 @@
 import { getURL } from '$lib/server/backend';
 import type { PageServerLoad } from './$types';
 
-function handleError(message: string): any {
-    return {
-        landingCard: {
-            error: message
-        }
-    };
-}
 
 export const load: PageServerLoad = async () => {
-
     const apiURL = getURL();
-    const endpoint = apiURL + '/api/landingcard'
 
-    let res: Response;
+    // Define endpoints
+    const landingCardEndpoint = apiURL + '/api/landingcard';
+    const projectsEndpoint = apiURL + '/api/projects';
 
-    try {
-        res = await fetch(endpoint);
-    } catch (err) {
-        console.error(`Unable to reach backend`, err);
-        return handleError("Unable to reach backend")
-    }
+    // Fetch both concurrently
+    const [landingRes, projectsRes] = await Promise.allSettled([
+        fetch(landingCardEndpoint),
+        fetch(projectsEndpoint)
+    ]);
 
-    if (!res.ok) {
-        let bodyText = "";
-        try {
-            bodyText = await res.text();
-        } catch {
-            bodyText = "<unreadable>";
+    // Landing card
+    let landingCard: any = {};
+    if (landingRes.status === 'fulfilled') {
+        const res = landingRes.value;
+        if (res.ok) {
+            try {
+                const json = await res.json();
+                landingCard = {
+                    bio: json.bio,
+                    email: json.email,
+                    linkedin: json.linkedin,
+                    github: json.github,
+                    skills: json.skills
+                };
+            } catch (err) {
+                console.error("Landing card JSON parse error:", err);
+                landingCard = { error: "Invalid landing card JSON" };
+            }
+        } else {
+            console.error(`Landing card HTTP ${res.status}: ${res.statusText}`);
+            landingCard = { error: `HTTP ${res.status}: ${res.statusText}`};
         }
-        console.error(`HTTP ${res.status}: ${res.statusText}, Body: ${bodyText}`);
-        return handleError(`HTTP ${res.status}: ${res.statusText}, Body: ${bodyText}`)
+    } else {
+        console.error("Unable to fetch landing card:", landingRes.reason);
+        landingCard = { error: `Unable to fetch landing card, ${landingRes.reason}` };
     }
 
-    let json: any;
-
-    try {
-        json = await res.json();
-    } catch (err) {
-        console.error("Backend returned non-JSON response", err);
-        return handleError("Backend returned non-JSON response")
+    // Projects
+    let projects: any[] = [];
+    if (projectsRes.status === 'fulfilled') {
+        const res = projectsRes.value;
+        if (res.ok) {
+            try {
+                projects = await res.json();
+            } catch (err) {
+                console.error("Projects JSON parse error:", err);
+            }
+        } else {
+            console.error(`Projects HTTP ${res.status}: ${res.statusText}`);
+        }
+    } else {
+        console.error("Unable to fetch projects:", projectsRes.reason);
     }
 
-    // no error happened, return a json struct to the ui
     return {
-        landingCard: {
-            bio: json.bio,
-            email: json.email,
-            linkedin: json.linkedin,
-            github: json.github,
-            skills: json.skills,
-        }
+        landingCard,
+        projects
     };
-
 };
