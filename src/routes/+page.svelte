@@ -45,7 +45,7 @@
 		<!-- <div class="h-48 w-48 overflow-hidden rounded-full border-4 border-stone-100 shadow-xl">
 				<img src="/me.jpg" alt="me" />
 			</div> -->
-		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan wtf</h1>
+		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan</h1>
 		<h2 class="text-lg sm:text-xl">
 			<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
 		</h2>
@@ -80,7 +80,10 @@
 	{/if}
 </section>
 
-<section id="projects" class="flex flex-col min-h-screen items-center justify-center gap-y-12 py-12">
+<section
+	id="projects"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 py-12"
+>
 	<h1 class="font-code mx-3 max-w-2xl text-center text-lg sm:text-xl">
 		Some projects I've worked on...
 	</h1>
@@ -89,7 +92,11 @@
 		<ProjectCard
 			icon="Puzzle"
 			title="Hangman Web App"
-			deploymentLink="https://app.nklein.xyz"
+			description={'Full-stack word-guessing game built with \
+			React, Prisma, and PostgreSQL. It features a daily global \
+			challenge word and player statistics, all managed server-side for consistent gameplay across \
+			users. The application is self-hosted on my home server for complete control over deployment \
+			and data.'}
 			technologies={[
 				'React',
 				'Next.js',
@@ -99,22 +106,17 @@
 				'tailwindCSS',
 				'Docker'
 			]}
-			description={'Full-stack word-guessing game built with \
-			React, Prisma, and PostgreSQL. It features a daily global \
-			challenge word and player statistics, all managed server-side for consistent gameplay across \
-			users. The application is self-hosted on my home server for complete control over deployment \
-			and data.'}
 			image="/hangman.jpg"
+			deploymentLink="https://app.nklein.xyz"
 		/>
 
 		<ProjectCard
 			icon="Globe"
 			title="This Website!"
-			technologies={['Svelte', 'Typescript', 'Go', 'PostgreSQL', 'tailwindCSS', 'Docker']}
-			description={'Svelte application fed with data from a PostgreSQL database via a GoLang backend, \
+			description={'Svelte C C++ C application fed with data from a PostgreSQL database via a GoLang backend, \
 			to allow for dynamic content changes without redeployment.  Deployed with Github \
 			Actions CI/CD pipeline on my home server.'}
-			image=""
+      technologies={['Svelte', 'C', 'Typescript', 'Go', 'PostgreSQL', 'tailwindCSS', 'Docker']}
 		/>
 	</div>
 
@@ -122,12 +124,12 @@
 		All of my source code & more projects are on
 		<span class="underline-offset-4 hover:underline">
 			<a
-				class="inline-flex items-center gap-0.5"
+				class="inline-flex items-center gap-0.5 underline hover:underline-offset-6"
 				href={data.landingCard?.github}
 				target="_blank"
 				rel="noopener noreferrer"
 			>
-				Github <ArrowUpRight size={24} class="mb-0.5" />
+				Github
 			</a>
 		</span>
 	</h1>

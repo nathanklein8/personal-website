@@ -42,7 +42,9 @@
 				<BadgeQuestionMark size={24} class="mb-0.5" />
 				About Me
 			</h1>
-			<p>{bio}</p>
+			<p class="text-foreground/80">
+				{bio}
+			</p>
 		</div>
 
 		<div class="space-y-4">
