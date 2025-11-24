@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ModeToggle from './mode-toggle.svelte';
+	import ModeToggle from '$lib/components/mode-toggle.svelte';
 	import {
 		Sheet,
 		SheetContent,

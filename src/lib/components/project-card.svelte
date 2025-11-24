@@ -31,7 +31,7 @@
 		altText = 'Project image'
 	}: Props = $props();
 
-	const IconComponent = iconMap[icon];
+	const IconComponent = iconMap[icon] ?? Puzzle; // fall back to Puzzle on invalid icon string in db
 
 	// Function to bold technologies found in the description
 	function highlightTechnologies(text: string, techs: string[]) {
