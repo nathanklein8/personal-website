@@ -2,10 +2,9 @@
 	import { enhance } from '$app/forms';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Card } from '$lib/components/ui/card';
-	import CardContent from '$lib/components/ui/card/card-content.svelte';
-	import CardTitle from '$lib/components/ui/card/card-title.svelte';
-	import { cn } from '$lib/utils.js';
-	import ErrorCard from '@/components/error-card.svelte';
+	import { CardContent, CardTitle } from '$lib/components/ui/card';
+	import { cn } from '$lib/utils';
+	import ErrorCard from '$lib/components/error-card.svelte';
 	import type { PageProps } from './$types';
 	import { Check, X } from '@lucide/svelte';
 
