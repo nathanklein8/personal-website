@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { Card } from '$lib/components/ui/card';
-	import { CardContent, CardTitle } from '$lib/components/ui/card';
+	import { Card, CardContent, CardTitle } from '$lib/components/ui/card';
 	import { cn } from '$lib/utils';
-	import ErrorCard from '$lib/components/error-card.svelte';
+	// import ErrorCard from '$lib/components/error-card.svelte';
 	import type { PageProps } from './$types';
 	import { Check, X } from '@lucide/svelte';
+	import Header from '$lib/components/Header.svelte';
 
 	let { data, form }: PageProps = $props();
 </script>
 
-<section id="landing-card-editor" class="flex flex-col items-center gap-4 py-8 pt-24">
+<section id="landing-card-editor" class="flex flex-col items-center gap-4 py-5 mt-16">
 	<h1 class="font-code text-lg">Edit Landing Card</h1>
 	<Card class="mx-3 w-2xl shadow-lg">
 		<CardContent>
 			{#if data.landingCard.error}
-				<ErrorCard description={data.landingCard.error} />
+				<!-- <ErrorCard description={data.landingCard.error} /> -->
+                 uh oh
 			{:else}
 				<form
 					class="flex flex-col items-center space-y-4"
@@ -81,7 +82,7 @@
 						</label>
 					</div>
 					<div class="flex items-center gap-2">
-						<button class={cn(buttonVariants({ size: 'sm' }), 'max-w-fit')}> Submit </button>
+						<button class={buttonVariants({ size: 'sm' })}> Submit </button>
 						{#if form?.success && form?.id == null}
 							<Check color={'green'} />
 						{:else if form?.failure && form?.id == null}
@@ -95,7 +96,7 @@
 	</Card>
 </section>
 
-<section id="projects-editor" class="flex flex-col items-center gap-4 py-8">
+<section id="projects-editor" class="flex flex-col items-center gap-4 py-5">
 	<h1 class="font-code text-lg">Edit Projects</h1>
 	{#each data.projects as project}
 		<Card class="mx-3 w-2xl shadow-lg">
@@ -181,7 +182,7 @@
 						</div>
 					</div>
 					<div class="flex items-center gap-2">
-						<button class={cn(buttonVariants({ size: 'sm' }), 'max-w-fit')}> Submit </button>
+						<button class={buttonVariants({ size: 'sm' })}> Submit </button>
 						{#if form?.success && form?.id == project.id}
 							<Check color={'green'} />
 						{:else if form?.failure && form?.id == project.id}

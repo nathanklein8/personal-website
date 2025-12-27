@@ -13,6 +13,17 @@ services:
     depends_on:
       - backend
 
+  admin:
+    container_name: pwsite-${ENV}-admin
+    build: ./admin
+    restart: unless-stopped
+    ports:
+      - "3103:3000"
+    environment:
+      - API_URL=${API_URL}
+    depends_on:
+      - backend
+
   backend:
     container_name: pwsite-${ENV}-backend
     build: ./backend
