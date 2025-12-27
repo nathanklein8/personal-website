@@ -31,8 +31,9 @@ func main() {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{
-			"http://app:3000",   // local docker hostname + internal port
-			"http://admin:3000", // admin console frontend (same as public frontend, diff docker hostname)
+			"http://app:3000", // local docker hostname + internal port (bc of reverse proxy)
+			// "http://admin:3000", // admin dashbaord (via reverse proxy)
+			"http://atlas:3103", // allow reqests to come from the admin dashboard
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},

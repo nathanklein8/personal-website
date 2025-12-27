@@ -3,7 +3,7 @@
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Card, CardContent, CardTitle } from '$lib/components/ui/card';
 	import { cn } from '$lib/utils';
-	// import ErrorCard from '$lib/components/error-card.svelte';
+	import ErrorCard from '$lib/components/error-card.svelte';
 	import type { PageProps } from './$types';
 	import { Check, X } from '@lucide/svelte';
 	import Header from '$lib/components/Header.svelte';
@@ -16,8 +16,7 @@
 	<Card class="mx-3 w-2xl shadow-lg">
 		<CardContent>
 			{#if data.landingCard.error}
-				<!-- <ErrorCard description={data.landingCard.error} /> -->
-                 uh oh
+				<ErrorCard description={data.landingCard.error} />
 			{:else}
 				<form
 					class="flex flex-col items-center space-y-4"
@@ -101,96 +100,100 @@
 	{#each data.projects as project}
 		<Card class="mx-3 w-2xl shadow-lg">
 			<CardContent>
-				<form
-					class="flex flex-col items-center space-y-4"
-					method="POST"
-					action={'?/updateProject'}
-					use:enhance
-				>
-					<div class="flex w-full flex-col gap-2">
-						<input
-							type="hidden"
-							required
-							name="id"
-							class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-							value={project.id}
-						/>
-						<div class="flex flex-row gap-4">
-							<label>
-								Title
-								<input
-									required
-									name="title"
-									class="mt-1 w-sm rounded-md border p-2 text-muted-foreground"
-									defaultValue={project.title}
-								/>
-							</label>
-							<label>
-								Icon
-								<input
-									required
-									name="icon"
-									class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-									defaultValue={project.icon}
-								/>
-							</label>
-						</div>
-						<label>
-							Description
-							<textarea
-								required
-								name="description"
-								rows="4"
-								defaultValue={project.description}
-								class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-							></textarea>
-						</label>
-						<label>
-							Technologies
-							<input
-								required
-								name="technologies"
-								defaultValue={project.technologies.join(',')}
-								class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-							/>
-						</label>
-						<label>
-							Deployment Link
-							<input
-								name="deploymentLink"
-								class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-								defaultValue={project.deploymentLink ?? ''}
-							/>
-						</label>
-						<div class="flex flex-row gap-4">
-							<label>
-								Image
-								<input
-									name="image"
-									class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-									defaultValue={project.image ?? ''}
-								/>
-							</label>
-							<label>
-								Alt Text
-								<input
-									name="altText"
-									class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
-									defaultValue={project.altText ?? ''}
-								/>
-							</label>
-						</div>
-					</div>
-					<div class="flex items-center gap-2">
-						<button class={buttonVariants({ size: 'sm' })}> Submit </button>
-						{#if form?.success && form?.id == project.id}
-							<Check color={'green'} />
-						{:else if form?.failure && form?.id == project.id}
-							<X color={'red'} />
-							{form.message}
-						{/if}
-					</div>
-				</form>
+				{#if data.landingCard.error}
+          <ErrorCard description={data.landingCard.error} />
+        {:else}
+          <form
+            class="flex flex-col items-center space-y-4"
+            method="POST"
+            action={'?/updateProject'}
+            use:enhance
+          >
+            <div class="flex w-full flex-col gap-2">
+              <input
+                type="hidden"
+                required
+                name="id"
+                class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                value={project.id}
+              />
+              <div class="flex flex-row gap-4">
+                <label>
+                  Title
+                  <input
+                    required
+                    name="title"
+                    class="mt-1 w-sm rounded-md border p-2 text-muted-foreground"
+                    defaultValue={project.title}
+                  />
+                </label>
+                <label>
+                  Icon
+                  <input
+                    required
+                    name="icon"
+                    class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                    defaultValue={project.icon}
+                  />
+                </label>
+              </div>
+              <label>
+                Description
+                <textarea
+                  required
+                  name="description"
+                  rows="4"
+                  defaultValue={project.description}
+                  class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                ></textarea>
+              </label>
+              <label>
+                Technologies
+                <input
+                  required
+                  name="technologies"
+                  defaultValue={project.technologies.join(',')}
+                  class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                />
+              </label>
+              <label>
+                Deployment Link
+                <input
+                  name="deploymentLink"
+                  class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                  defaultValue={project.deploymentLink ?? ''}
+                />
+              </label>
+              <div class="flex flex-row gap-4">
+                <label>
+                  Image
+                  <input
+                    name="image"
+                    class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                    defaultValue={project.image ?? ''}
+                  />
+                </label>
+                <label>
+                  Alt Text
+                  <input
+                    name="altText"
+                    class="mt-1 w-full rounded-md border p-2 text-muted-foreground"
+                    defaultValue={project.altText ?? ''}
+                  />
+                </label>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class={buttonVariants({ size: 'sm' })}> Submit </button>
+              {#if form?.success && form?.id == project.id}
+                <Check color={'green'} />
+              {:else if form?.failure && form?.id == project.id}
+                <X color={'red'} />
+                {form.message}
+              {/if}
+            </div>
+          </form>
+        {/if}
 			</CardContent>
 		</Card>
 	{/each}
