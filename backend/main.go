@@ -31,8 +31,8 @@ func main() {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{
-			"http://localhost:5173", // dev env (not docker)
-			"http://app:3000",       // local docker hostname + internal port
+			"http://app:3000",   // local docker hostname + internal port
+			"http://admin:3000", // admin console frontend (same as public frontend, diff docker hostname)
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
