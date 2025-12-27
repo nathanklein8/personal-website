@@ -7,6 +7,7 @@ on:
       - test
     paths-ignore:
       - 'backend/**'
+      - 'admin/**'
       - 'README.md'
       - '**/README.md'
       - '*.example'
@@ -51,5 +52,4 @@ jobs:
           docker compose up -d --no-deps --build app
 
       - name: (prod) Connect to Proxy Network
-        if: env.ENV == 'prod'
-        run: docker network connect nathan_default pwsite-prod-app
+        run: docker network connect nathan_default pwsite-${{ env.ENV }}-app
