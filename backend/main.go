@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
+	// "github.com/go-chi/cors"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"nklein.xyz/backend/routes"
@@ -29,17 +29,15 @@ func main() {
 	// Router
 	r := chi.NewRouter()
 
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{
-			"http://app:3000", // local docker hostname + internal port (bc of reverse proxy)
-			// "http://admin:3000", // admin dashbaord (via reverse proxy)
-			"http://atlas:3103", // allow reqests to come from the admin dashboard
-		},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		AllowCredentials: true,
-		MaxAge:           300,
-	}))
+	// r.Use(cors.Handler(cors.Options{
+	// 	AllowedOrigins: []string{
+	// 		"http://app:3000", // local docker hostname + internal port (bc of reverse proxy)
+	// 	},
+	// 	AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	// 	AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           300,
+	// }))
 
 	// Mount grouped routes
 	r.Mount("/api", routes.HealthRoutes(s))
