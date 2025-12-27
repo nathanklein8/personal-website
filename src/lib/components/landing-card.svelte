@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge';
 	import { Card, CardContent } from '$lib/components/ui/card';
-	import CardFooter from '$lib/components/ui/card/card-footer.svelte';
+	import { CardFooter } from '$lib/components/ui/card';
 	import {
 		ArrowUpRight,
 		BadgeQuestionMark,
