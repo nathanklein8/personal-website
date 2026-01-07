@@ -21,8 +21,7 @@ jobs:
 
       # set api URL
       # for dev, this should be localhost:<backend port>
-      # for test, <backend container name>:<internal port (8080)>
-      # for prod, same as test.  Not sure abt this yet tho
+      # for test/prod, <backend container name>:<internal port (8080)>
       API_URL: 'http://backend:8080'
       
     steps:
