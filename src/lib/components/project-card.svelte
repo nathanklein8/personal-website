@@ -4,13 +4,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Puzzle, Globe } from '@lucide/svelte';
 
-	export let title;
-	export let deploymentLink = '';
-	export let technologies;
-	export let description;
-	export let image = '';
-	export let altText = 'Project image';
-
 	const iconMap = {
 		Puzzle,
 		Globe
@@ -18,46 +11,58 @@
 
 	type Icon = keyof typeof iconMap;
 
-	export let icon: Icon = 'Puzzle';
+	interface Props {
+		icon: Icon;
+		title: string;
+		description: string;
+		technologies: string[];
+		deploymentLink?: string;
+		image?: string;
+		altText?: string;
+	}
 
-	$: IconComponent = iconMap[icon] || Puzzle;
+	let {
+		icon,
+		title,
+		description,
+		technologies,
+		deploymentLink = '',
+		image = '',
+		altText = 'Project image'
+	}: Props = $props();
+
+	const IconComponent = iconMap[icon] ?? Puzzle; // fall back to Puzzle on invalid icon string in db
 
 	// Function to bold technologies found in the description
-	$: highlightedDescription = highlightTechnologies(description, technologies);
 	function highlightTechnologies(text: string, techs: string[]) {
-		if (!text || !techs?.length) return text;
-
-		// Sort longer tech names first to avoid partial matches (e.g. "C" in "C++")
-		const sortedTechs = [...techs].sort((a, b) => b.length - a.length);
-
+		
 		// Create a regex to match any technology word (case-insensitive)
-		const regex = new RegExp(`\\b(${sortedTechs.join('|')})\\b`, 'gi');
+		const regex = new RegExp(`\\b(${techs.join('|')})\\b`, 'gi');
 
-		return text.replace(regex, (match) => `<span class="font-semibold">${match}</span>`);
+		return text.replace(
+			regex,
+			(match) => `<span class="font-semibold text-foreground/80">${match}</span>`
+		);
 	}
+	// const highlightedDescription = highlightTechnologies(description, technologies);
 </script>
 
-<Card class="max-w-[95vw] shadow-lg md:max-w-[80vw] lg:max-w-[65vw] xl:max-w-[50vw]">
-	<CardTitle class="font-code flex flex-row flex-wrap items-center gap-2 px-6 text-lg sm:text-xl">
+<Card class="mx-3 max-w-3xl shadow-lg">
+	<CardTitle
+		class="font-code flex min-h-8 flex-row flex-wrap items-center justify-between gap-2 px-6 text-lg sm:text-xl"
+	>
 		<h1 class="flex items-center gap-2 font-normal text-wrap">
-			<svelte:component this={IconComponent} size={22} />
+			<IconComponent class="mb-0.5"/>
 			{title}
 		</h1>
+		<!-- show a 'Try it!' button when a deployment link is passed -->
 		{#if deploymentLink != ''}
-			<span class="flex grow"></span>
-			<Button variant="green">
-				<a
-					class="font-code text-md md:text-lg"
-					href={deploymentLink}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Try it!
-				</a>
+			<Button size="sm" class="font-code">
+				<a href={deploymentLink} target="_blank" rel="noopener noreferrer"> Try it! </a>
 			</Button>
 		{/if}
 	</CardTitle>
-	<CardContent class={image != '' ? 'grid gap-6 sm:grid-cols-2' : 'flex'}>
+	<CardContent class={image != '' ? 'grid gap-6 sm:grid-cols-2' : ''}>
 		{#if image}
 			<img
 				src={image}
@@ -65,7 +70,9 @@
 				class="aspect-square max-w-full rounded-lg object-cover sm:max-w-full"
 			/>
 		{/if}
-		<p>{@html highlightedDescription}</p>
+		<p class="text-muted-foreground">
+			{@html highlightTechnologies(description, technologies)}
+		</p>
 	</CardContent>
 	<CardFooter class="flex flex-wrap gap-2 border-t">
 		{#each technologies as tech}
