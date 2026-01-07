@@ -15,5 +15,6 @@ COPY --from=builder /app/build ./build
 COPY --from=builder /app/package.json ./package.json
 # Install prod deps for Node
 RUN npm install --omit=dev
+ENV ORIGIN=http://atlas:3103
 EXPOSE 3000
 CMD ["node", "build"]
