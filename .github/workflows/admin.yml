@@ -7,6 +7,8 @@ on:
       - test
     paths:
       - "admin/**"
+      - ".github/workflows/admin.yml"
+      - "compose.yaml"
 
 jobs:
   build-and-deploy:
