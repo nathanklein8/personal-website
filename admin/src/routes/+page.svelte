@@ -1,12 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { buttonVariants } from '$lib/components/ui/button';
-	import { Card, CardContent, CardTitle } from '$lib/components/ui/card';
-	import { cn } from '$lib/utils';
+	import { Card, CardContent } from '$lib/components/ui/card';
 	import ErrorCard from '$lib/components/error-card.svelte';
 	import type { PageProps } from './$types';
 	import { Check, X } from '@lucide/svelte';
-	import Header from '$lib/components/Header.svelte';
 
 	let { data, form }: PageProps = $props();
 </script>
