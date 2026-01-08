@@ -15,7 +15,13 @@ services:
 
   admin:
     container_name: pwsite-${ENV}-admin
-    build: ./admin
+    build: 
+      context: ./admin
+      args:
+        # tell non ssl admin ui its origin so it c
+        # can do svelte server side actions
+        # different for test/prod
+        ORIGIN: http://atlas:${ADMIN_PORT}
     restart: unless-stopped
     ports:
       - "${ADMIN_PORT}:3000"
