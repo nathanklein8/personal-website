@@ -27,6 +27,8 @@ jobs:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
 
+      APP_PORT: ${{ vars.APP_PORT }}
+
       # set api URL
       # for dev, this should be localhost:<backend port>
       # for test/prod, <backend container name>:<internal port (8080)>
