@@ -13,6 +13,7 @@ on:
       - '*.example'
       - '.gitignore'
       - '.github/workflows/backend.yml'
+      - '.github/workflows/admin.yml'
       - '.github/workflows/database.yml'
 
 jobs:
@@ -26,12 +27,9 @@ jobs:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
 
-      APP_PORT: ${{ vars.APP_PORT }}
-
       # set api URL
       # for dev, this should be localhost:<backend port>
-      # for test, <backend container name>:<internal port (8080)>
-      # for prod, same as test.  Not sure abt this yet tho
+      # for test/prod, <backend container name>:<internal port (8080)>
       API_URL: 'http://backend:8080'
       
     steps:

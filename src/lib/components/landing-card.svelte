@@ -12,13 +12,13 @@
 	} from '@lucide/svelte';
 	import { cn } from '$lib/utils';
 
-    interface Props {
-        bio: string,
-        email: string,
-        linkedin: string,
-        github: string,
-        skills: string[][],
-    }
+	interface Props {
+		bio: string;
+		email: string;
+		linkedin: string;
+		github: string;
+		skills: string[][];
+	}
 
 	let { bio, email, linkedin, github, skills }: Props = $props();
 
@@ -28,7 +28,7 @@
 		try {
 			await navigator.clipboard.writeText(email);
 			copied = true;
-			setTimeout(() => (copied = false), 3000);
+			setTimeout(() => (copied = false), 5000);
 		} catch (e) {
 			console.error('Clipboard write failed', e);
 		}
@@ -55,32 +55,33 @@
 			<div class="space-y-3">
 				<div class="flex flex-row gap-4">
 					<p class="flex max-w-fit items-center gap-0.5 underline-offset-4 hover:underline">
-						<a href={linkedin} target="_blank" rel="noopener noreferrer">
-							LinkedIn
-						</a>
+						<a href={linkedin} target="_blank" rel="noopener noreferrer"> LinkedIn </a>
 						<ArrowUpRight size={20} />
 					</p>
 					<p class="flex max-w-fit items-center gap-0.5 underline-offset-4 hover:underline">
-						<a href={github} target="_blank" rel="noopener noreferrer">
-							Github
-						</a>
+						<a href={github} target="_blank" rel="noopener noreferrer"> Github </a>
 						<ArrowUpRight size={20} />
 					</p>
 				</div>
 				<button
 					class={cn(
 						copied ? 'text-muted-foreground' : '',
-						'font-code-wide flex w-full flex-row items-center rounded-lg border-1 border-foreground/25 bg-background/80 p-3 text-sm'
+						'group font-code-wide flex w-full relative flex-row items-center rounded-lg border-1 border-foreground/25 bg-background/80 p-3 text-sm transition-color duration-300'
 					)}
 					onclick={copyEmail}
 				>
-					$ {email}
-					<span class="flex grow"></span>
-					{#if copied}
-						<ClipboardCheck size={20} />
-					{:else}
+				  $ {email}
+
+          <!-- show when not copied AND hovering -->
+					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-0' : 'opacity-0 group-hover:opacity-100')}>
 						<Clipboard size={20} />
-					{/if}
+					</span>
+
+          <!-- show when copied is true -->
+					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-100' : 'opacity-0')}>
+						<ClipboardCheck size={20} />
+					</span>
+
 				</button>
 			</div>
 		</div>
