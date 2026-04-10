@@ -26,6 +26,10 @@
 
 	let copied = $state(false);
 
+	onMount(() => {
+		const isMobile: boolean = Device.isPhone || Device.isTablet;
+	});
+
 	async function copyEmail() {
 		try {
 			await navigator.clipboard.writeText(email);
@@ -75,7 +79,7 @@
 				  $ {email}
 
           <!-- show clipboard icon: always on mobile, on hover only on desktop -->
-					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-0' : (!(Device.isPhone || Device.isTablet) ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'))}>
+					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-0' : (isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'))}>
 						<Clipboard size={20} />
 					</span>
 
