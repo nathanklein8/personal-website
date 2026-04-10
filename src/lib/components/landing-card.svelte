@@ -10,7 +10,9 @@
 		ClipboardCheck,
 		MessageCircle
 	} from '@lucide/svelte';
+	import Device from 'svelte-device-info';
 	import { cn } from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		bio: string;
@@ -68,16 +70,16 @@
 						copied ? 'text-muted-foreground' : '',
 						'group font-code-wide flex w-full relative flex-row items-center rounded-lg border-1 border-foreground/25 bg-background/80 p-3 text-sm transition-color duration-300'
 					)}
-					onclick={copyEmail}
+					on:click={copyEmail}
 				>
 				  $ {email}
 
-          <!-- show when not copied AND hovering -->
-					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-0' : 'opacity-0 group-hover:opacity-100')}>
+          <!-- show clipboard icon: always on mobile, on hover only on desktop -->
+					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-0' : (!(Device.isPhone || Device.isTablet) ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'))}>
 						<Clipboard size={20} />
 					</span>
 
-          <!-- show when copied is true -->
+          <!-- show clipboard-check when copied -->
 					<span class={cn('absolute right-3 transition-opacity duration-200', copied ? 'opacity-100' : 'opacity-0')}>
 						<ClipboardCheck size={20} />
 					</span>
