@@ -25,6 +25,11 @@
 	let { bio, email, linkedin, github, skills }: Props = $props();
 
 	let copied = $state(false);
+	let isMobile: boolean = $state(false);
+
+	onMount(() => {
+		isMobile = Device.isPhone || Device.isTablet;
+	});
 
 	onMount(() => {
 		const isMobile: boolean = Device.isPhone || Device.isTablet;
