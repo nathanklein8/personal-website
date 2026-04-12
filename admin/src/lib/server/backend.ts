@@ -17,11 +17,13 @@ export async function getContent() {
   // endpoints to fetch
   const landingCardEndpoint = apiURL + '/api/landingcard';
   const projectsEndpoint = apiURL + '/api/projects';
+  const photosEndpoint = apiURL + '/api/photos';
 
   // get promises for all endpoints
-  const [landingRes, projectsRes] = await Promise.allSettled([
+  const [landingRes, projectsRes, photosRes] = await Promise.allSettled([
     fetch(landingCardEndpoint),
-    fetch(projectsEndpoint)
+    fetch(projectsEndpoint),
+    fetch(photosEndpoint)
   ]);
 
   // handle landing card promise
@@ -54,8 +56,25 @@ export async function getContent() {
     projects = [{ error: `Unable to reach backend: ${projectsRes.reason}` }]
   }
 
+  // handle photos promise
+  let photos: any[] = [];
+  if (photosRes.status === 'fulfilled') {
+    const res = photosRes.value;
+    if (res.ok) {
+      photos = await res.json();
+    } else {
+      console.error(`Unable to fetch photos, HTTP ${res.status}: ${res.statusText}`);
+      photos = [{ error: `Unable to fetch photos, HTTP ${res.status}: ${res.statusText}` }]
+    }
+  } else {
+    console.error(`Unable to reach backend: ${photosRes.reason}`);
+    photos = [{ error: `Unable to reach backend: ${photosRes.reason}` }]
+  }
+
   return {
     landingCard,
-    projects
+    projects,
+    photos,
+    apiURL
   };
 }

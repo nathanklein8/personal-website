@@ -10,6 +10,7 @@
 	import type { PageProps } from './$types';
 	import ErrorCard from '$lib/components/error-card.svelte';
 	import LandingCard from '$lib/components/landing-card.svelte';
+	import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '$lib/components/ui/carousel';
 
 	let { data }: PageProps = $props();
 
@@ -19,15 +20,13 @@
 		const isMobile: boolean = Device.isPhone || Device.isTablet;
 
 		if (window.scrollY > window.innerHeight * 0.05) {
-			return; // No need to add scroll listener
+			return;
 		} else {
 			showScrollIcon = !isMobile;
 		}
 		const handleScroll = () => {
 			const scrollY = window.scrollY;
 			const threshold = window.innerHeight * 0.05;
-			// turn off scroll hint after user scrolls over 5% of screen height
-			// and don't turn scroll hint back on, even if they scroll back up
 			showScrollIcon = showScrollIcon && scrollY < threshold;
 		};
 
@@ -40,28 +39,21 @@
 	id="landing"
 	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
 >
-	<!-- heading that displays my name and a typewriter effect tagline -->
 	<div class="font-code flex flex-col items-center space-y-4">
-		<!-- <div class="h-48 w-48 overflow-hidden rounded-full border-4 border-stone-100 shadow-xl">
-				<img src="/me.jpg" alt="me" />
-			</div> -->
 		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan</h1>
 		<h2 class="text-lg sm:text-xl">
 			<TypeWriter typeSpeed={150} deleteSpeed={200} texts={['CS @ RIT', 'New Grad']} />
 		</h2>
 	</div>
 
-	<!-- display landing 'about me' card, when data is present, and there is no error field on the json -->
 	{#if data.landingCard && !data.landingCard.error}
 		<LandingCard {...data.landingCard} />
 	{/if}
 
-	<!-- display an error alert if there is an error field on the landing card json -->
 	{#if data.landingCard.error}
 		<ErrorCard description={data.landingCard.error} />
 	{/if}
 
-	<!-- show a little fixed position hint scroll -->
 	{#if showScrollIcon}
 		<div
 			in:fade={{ duration: 1200, easing: expoIn }}
@@ -82,7 +74,6 @@
 		Some projects I've worked on...
 	</h1>
 
-	<!-- display list of project cards, in the order returned by -->
 	<div class="flex flex-col gap-y-8">
 		{#each data.projects as proj}
 			<ProjectCard {...proj} />
@@ -99,6 +90,7 @@
 				rel="noopener noreferrer"
 			>
 				Github
+				<ArrowUpRight class="h-4 w-4" />
 			</a>
 		</span>
 	</h1>
@@ -108,12 +100,34 @@
 	id="featured-photography"
 	class="flex min-h-[85vh] flex-col items-center justify-center gap-y-12 bg-secondary py-16"
 >
-	<h1 class="font-code text-center text-lg sm:text-xl">Photography</h1>
+	<h1 class="font-code text-center text-lg sm:text-xl">Featured Photography</h1>
 
-	<div
-		class="border-2 border-foreground bg-background p-24 text-center text-muted-foreground lg:p-32"
-	>
-		under construction...
+	<div class="grid gap-8 justify-items-center px-4 w-full">
+		{#if data.featuredPhotos && data.featuredPhotos.length > 0}
+			<Carousel class="max-w-[85vw]" opts={{ loop: true }}>
+				<CarouselContent class="">
+					{#each data.featuredPhotos as photo, index}
+						<CarouselItem class="basis-auto">
+							<div class="w-[50vw] md:w-[75vw] bg-muted flex items-center justify-center overflow-hidden">
+								<img
+									src={`${data.apiURL}/api/photos/${photo.id}/image`}
+									alt={photo.altText || photo.title}
+									class="aspect-3/2 object-contain w-full h-full"
+								/>
+							</div>
+						</CarouselItem>
+					{/each}
+				</CarouselContent>
+				<CarouselPrevious />
+				<CarouselNext />
+			</Carousel>
+		{/if}
+
+		{#if !(data.featuredPhotos && data.featuredPhotos.length > 0)}
+			<div class="text-center border-2 border-foreground bg-background p-24 text-center text-muted-foreground lg:p-32">
+				<p>No featured photos yet. Check back later!</p>
+			</div>
+		{/if}
 	</div>
 
 	<Button class="font-code">

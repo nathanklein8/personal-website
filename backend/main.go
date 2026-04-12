@@ -43,6 +43,7 @@ func main() {
 	r.Mount("/api", routes.HealthRoutes(s))
 	r.Mount("/api/landingcard", routes.LandingCardRoutes(s))
 	r.Mount("/api/projects", routes.ProjectRoutes(s))
+	r.Mount("/api/photos", routes.PhotoRoutes(s))
 
 	addr := ":8080"
 	fmt.Printf("🚀 Starting server on %s\n", addr)

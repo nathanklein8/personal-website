@@ -9,6 +9,7 @@
 	export let onOpenChange: (value: boolean) => void = () => {};
 
 	export let photo = {
+		id: 0,
 		title: "Untitled",
 		src: "",
 		alt: "",
