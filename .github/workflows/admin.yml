@@ -22,6 +22,7 @@ jobs:
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
 
       ADMIN_PORT: ${{ vars.ADMIN_PORT }}
+      PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
 
       # set api URL
       # for dev, this should be localhost:<backend port>
