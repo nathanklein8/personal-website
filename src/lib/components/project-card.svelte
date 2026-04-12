@@ -35,6 +35,7 @@
 
 	// Function to bold technologies found in the description
 	function highlightTechnologies(text: string, techs: string[]) {
+		if (!techs || techs.length === 0) return text;
 		
 		// Create a regex to match any technology word (case-insensitive)
 		const regex = new RegExp(`\\b(${techs.join('|')})\\b`, 'gi');

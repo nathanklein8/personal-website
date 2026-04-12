@@ -51,6 +51,7 @@
 	},
 	"dependencies": {
 		"dotenv": "^17.2.3",
+		"embla-carousel-svelte": "^8.6.0",
 		"mode-watcher": "^1.1.0",
 		"svelte-device-info": "^1.0.6",
 		"svelte-typewrite": "^3.0.0",

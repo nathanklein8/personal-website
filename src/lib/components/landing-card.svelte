@@ -31,10 +31,6 @@
 		isMobile = Device.isPhone || Device.isTablet;
 	});
 
-	onMount(() => {
-		const isMobile: boolean = Device.isPhone || Device.isTablet;
-	});
-
 	async function copyEmail() {
 		try {
 			await navigator.clipboard.writeText(email);
@@ -79,7 +75,7 @@
 						copied ? 'text-muted-foreground' : '',
 						'group font-code-wide flex w-full relative flex-row items-center rounded-lg border-1 border-foreground/25 bg-background/80 p-3 text-sm transition-color duration-300'
 					)}
-					on:click={copyEmail}
+					onclick={copyEmail}
 				>
 				  $ {email}
 

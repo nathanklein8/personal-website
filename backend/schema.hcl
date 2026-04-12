@@ -63,3 +63,64 @@ table "projects" {
     columns = [column.id]
   }
 }
+
+table "photos" {
+  schema = schema.public
+  column "id" {
+    type = serial
+  }
+  column "title" {
+    type = text
+    null = false
+  }
+  column "file_path" {
+    type = text
+    null = false
+    // relative path within the volume mount, e.g. "landscapes/sunset.jpg"
+  }
+  column "alt_text" {
+    type = text
+    null = true
+  }
+  column "date_taken" {
+    type = text
+    null = true
+  }
+  column "location" {
+    type = text
+    null = true
+  }
+  column "camera" {
+    type = text
+    null = true
+  }
+  column "lens" {
+    type = text
+    null = true
+  }
+  column "aperture" {
+    type = text
+    null = true
+  }
+  column "shutter_speed" {
+    type = text
+    null = true
+  }
+  column "iso" {
+    type = text
+    null = true
+  }
+  column "visible" {
+    type = boolean
+    null = false
+    default = true
+  }
+  column "sort_order" {
+    type = integer
+    null = false
+    default = 0
+  }
+  primary_key {
+    columns = [column.id]
+  }
+}

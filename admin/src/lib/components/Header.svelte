@@ -12,8 +12,9 @@
 	class:pointer-events-none={!visible}
 >
 	<nav class="text-lg flex flex-row items-center justify-center gap-3 px-4 sm:px-6">
-		<a href="/" class="font-semibold hover:font-bold">Edit Site Contents</a>
+		<a href="/" class="font-semibold hover:font-bold">Landing Page</a>
 		<span class="flex grow"></span>
+		<a href="/photos" class="font-semibold hover:font-bold">Photos</a>
 		<ModeToggle />
 	</nav>
 </header>
