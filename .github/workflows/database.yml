@@ -30,6 +30,7 @@ jobs:
 
       # pass this to migration command, need INTERNAL port, not port exposed to host
       DATABASE_URL: "postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@db:5432/${{ vars.POSTGRES_DB }}?sslmode=disable"
+      PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
 
     steps:
       - name: Checkout repository
