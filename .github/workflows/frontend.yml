@@ -42,8 +42,7 @@ jobs:
           push: false
           load: true
           tags: ${{ env.IMAGE_TAG }}, app:latest
-          labels:
-            - "environment=${{ github.ref_name }}"
+          labels: "environment=${{ github.ref_name }}"
 
   deploy-frontend:
     runs-on: self-hosted
