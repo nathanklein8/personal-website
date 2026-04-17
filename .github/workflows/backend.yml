@@ -26,7 +26,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend"
+      IMAGE_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend"
 
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
           file: ./backend/Dockerfile
           push: false
           load: true
-          tags: ${{ env.IMAGE_TAG }}:latest
+          tags: ${{ env.IMAGE_NAME }}:latest
 
       - name: Save image
         run: docker save -o /tmp/pwsite-images/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
@@ -62,7 +62,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend"
+      IMAGE_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend"
 
     steps:
       - name: Load image
