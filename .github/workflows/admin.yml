@@ -67,4 +67,4 @@ jobs:
 
       - name: Restart Admin Service
         run: |
-          docker compose up -d --no-deps --build admin
+          docker compose up -d --no-deps admin
