@@ -26,7 +26,7 @@ jobs:
       APP_PORT: ${{ vars.APP_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
       API_URL: 'http://backend:8080'
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-app:latest"
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-app"
 
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
           file: ./Dockerfile
           push: false
           load: true
-          tags: ${{ env.IMAGE_TAG }}
+          tags: ${{ env.IMAGE_TAG }}:latest
 
       - name: touch file
         run: touch ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar

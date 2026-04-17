@@ -20,7 +20,7 @@ jobs:
       ADMIN_PORT: ${{ vars.ADMIN_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
       API_URL: 'http://backend:8080'
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin:latest"
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin"
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
           file: ./admin/Dockerfile
           push: false
           load: true
-          tags: ${{ env.IMAGE_TAG }}
+          tags: ${{ env.IMAGE_TAG }}:latest
 
       - name: touch file
         run: touch ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
