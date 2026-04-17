@@ -26,7 +26,7 @@ jobs:
       APP_PORT: ${{ vars.APP_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
       API_URL: 'http://backend:8080'
-      IMAGE_TAG: "app-${{ github.ref_name == 'main' && 'prod' || 'test' }}:latest"
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-app:latest"
 
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +42,8 @@ jobs:
           push: false
           load: true
           tags: ${{ env.IMAGE_TAG }}, app:latest
+          labels:
+            - "environment=${{ github.ref_name }}"
 
   deploy-frontend:
     runs-on: self-hosted
@@ -62,7 +64,7 @@ jobs:
 
       - name: Save Frontend Image
         run: |
-          docker save -p frontend-app.tar ${{ env.IMAGE_TAG }}, app:latest
+          docker save -o frontend-app.tar ${{ env.IMAGE_TAG }}, app:latest
 
       - name: Upload frontend image artifact
         uses: actions/upload-artifact@v4
