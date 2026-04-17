@@ -10,164 +10,71 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"database/sql"
+	"nklein.xyz/backend/models"
+	"nklein.xyz/backend/repository"
 	"nklein.xyz/backend/server"
+	"nklein.xyz/backend/service"
 )
 
-type Photo struct {
-	ID           int     `json:"id,omitempty"`
-	Title        string  `json:"title"`
-	FilePath     string  `json:"filePath"`
-	AltText      *string `json:"altText,omitempty"`
-	DateTaken    *string `json:"dateTaken,omitempty"`
-	Location     *string `json:"location,omitempty"`
-	Camera       *string `json:"camera,omitempty"`
-	Lens         *string `json:"lens,omitempty"`
-	Aperture     *string `json:"aperture,omitempty"`
-	ShutterSpeed *string `json:"shutterSpeed,omitempty"`
-	ISO          *string `json:"iso,omitempty"`
-	Visible      bool    `json:"visible"`
-	Featured     bool    `json:"featured,omitempty"`
-	SortOrder    int     `json:"sortOrder"`
+type PhotoController struct {
+	service *service.PhotoService
 }
 
-
-type PhotoCreateRequest struct {
-	Title        *string   `json:"title"`
-	FilePath     string    `json:"file_path"`
-	AltText      *string   `json:"altText,omitempty"`
-	DateTaken    *string   `json:"dateTaken,omitempty"`
-	Location     *string   `json:"location,omitempty"`
-	Camera       *string   `json:"camera,omitempty"`
-	Lens         *string   `json:"lens,omitempty"`
-	Aperture     *string   `json:"aperture,omitempty"`
-	ShutterSpeed *string   `json:"shutterSpeed,omitempty"`
-	ISO          *string   `json:"iso,omitempty"`
-	Visible      *bool     `json:"visible,omitempty"`
-	Featured     *bool     `json:"featured,omitempty"`
-	SortOrder    *int      `json:"sortOrder,omitempty"`
+func NewPhotoController(svc *service.PhotoService) *PhotoController {
+	return &PhotoController{service: svc}
 }
 
-
-type PhotoUpdateRequest struct {
-	Title        *string   `json:"title"`
-	FilePath     string    `json:"file_path,omitempty"`
-	AltText      *string   `json:"altText,omitempty"`
-	DateTaken    *string   `json:"dateTaken,omitempty"`
-	Location     *string   `json:"location,omitempty"`
-	Camera       *string   `json:"camera,omitempty"`
-	Lens         *string   `json:"lens,omitempty"`
-	Aperture     *string   `json:"aperture,omitempty"`
-	ShutterSpeed *string   `json:"shutterSpeed,omitempty"`
-	ISO          *string   `json:"iso,omitempty"`
-	Visible      bool      `json:"visible,omitempty"`
-	Featured     bool      `json:"featured,omitempty"`
-	SortOrder    int       `json:"sortOrder,omitempty"`
-}
 func PhotoRoutes(s *server.Server) chi.Router {
 	r := chi.NewRouter()
+	controller := NewPhotoController(service.NewPhotoService(repository.NewPhotoRepository(s.DB)))
 
-	// get list of all photo objs
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		handleGetPhotos(s, w, r)
-	})
-
-	// manage existing photos (delete / edit)
-	r.Put("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		handleEditPhoto(s, w, r)
-	})
-	r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
-		handleDeletePhoto(s, w, r)
-	})
-
-	// create new photo record
-	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-		handleCreatePhoto(s, w, r)
-	})
-
-	// serve actual image file from volume
-	r.Get("/{id}/image", func(w http.ResponseWriter, r *http.Request) {
-		handleServeImage(s, w, r)
-	})
+	r.Get("/", controller.GetAll)
+	r.Post("/", controller.Create)
+	r.Put("/{id}", controller.Update)
+	r.Delete("/{id}", controller.DeleteByID)
+	r.Get("/{id}/image", controller.ServeImage)
 
 	return r
 }
 
 // GET /api/photos
-func handleGetPhotos(s *server.Server, w http.ResponseWriter, r *http.Request) {
+func (c *PhotoController) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
-	rows, err := s.DB.QueryContext(ctx, `
-        SELECT id, title, file_path, alt_text, date_taken, location, 
-               camera, lens, aperture, shutter_speed, iso, visible, sort_order 
-        FROM photos 
-        ORDER BY sort_order ASC, id ASC
-    `)
+	photos, err := c.service.GetAll(ctx)
 	if err != nil {
 		http.Error(w, "failed to fetch photos", http.StatusInternalServerError)
 		return
-	}
-	defer rows.Close()
-
-	var photos []Photo
-
-	for rows.Next() {
-		var p Photo
-		if err := rows.Scan(
-			&p.ID,
-			&p.Title,
-			&p.FilePath,
-			&p.AltText,
-			&p.DateTaken,
-			&p.Location,
-			&p.Camera,
-			&p.Lens,
-			&p.Aperture,
-			&p.ShutterSpeed,
-			&p.ISO,
-			&p.Visible,
-			&p.SortOrder,
-		); err != nil {
-			http.Error(w, "failed to scan photo row", http.StatusInternalServerError)
-			return
-		}
-		photos = append(photos, p)
 	}
 
 	json.NewEncoder(w).Encode(photos)
 }
 
 // POST /api/photos
-func handleCreatePhoto(s *server.Server, w http.ResponseWriter, r *http.Request) {
+func (c *PhotoController) Create(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
-	var p Photo
+	var p models.Photo
 	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	err := s.DB.QueryRowContext(ctx, `
-        INSERT INTO photos (title, file_path, alt_text, date_taken, location, camera, lens, aperture, shutter_speed, iso, visible, sort_order)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-        RETURNING id
-    `,
-		p.Title,
-		p.FilePath,
-		p.AltText,
-		p.DateTaken,
-		p.Location,
-		p.Camera,
-		p.Lens,
-		p.Aperture,
-		p.ShutterSpeed,
-		p.ISO,
-		p.Visible,
-		p.SortOrder,
-	).Scan(&p.ID)
+	if err := c.service.ValidatePhotoCreate(&models.PhotoCreateRequest{
+		Title:    &p.Title,
+		FilePath: p.FilePath,
+	}); err != nil {
+		if apiErr, ok := err.(*service.APIError); ok {
+			http.Error(w, apiErr.Message, apiErr.Status)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 
-	if err != nil {
+	if err := c.service.Create(ctx, &p); err != nil {
 		http.Error(w, "failed to insert photo", http.StatusInternalServerError)
 		return
 	}
@@ -177,7 +84,7 @@ func handleCreatePhoto(s *server.Server, w http.ResponseWriter, r *http.Request)
 }
 
 // PUT /api/photos/{id}
-func handleEditPhoto(s *server.Server, w http.ResponseWriter, r *http.Request) {
+func (c *PhotoController) Update(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
@@ -188,51 +95,44 @@ func handleEditPhoto(s *server.Server, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p Photo
+	var p models.PhotoUpdateRequest
 	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	res, err := s.DB.ExecContext(ctx, `
-        UPDATE photos
-        SET title = $1,
-            file_path = $2,
-            alt_text = $3,
-            date_taken = $4,
-            location = $5,
-            camera = $6,
-            lens = $7,
-            aperture = $8,
-            shutter_speed = $9,
-            iso = $10,
-            visible = $11,
-            sort_order = $12
-        WHERE id = $13
-    `,
-		p.Title,
-		p.FilePath,
-		p.AltText,
-		p.DateTaken,
-		p.Location,
-		p.Camera,
-		p.Lens,
-		p.Aperture,
-		p.ShutterSpeed,
-		p.ISO,
-		p.Visible,
-		p.SortOrder,
-		id,
-	)
-
-	if err != nil {
-		http.Error(w, "failed to update photo", http.StatusInternalServerError)
-		return
+	if err := c.service.ValidatePhotoUpdate(&p); err != nil {
+		if apiErr, ok := err.(*service.APIError); ok {
+			http.Error(w, apiErr.Message, apiErr.Status)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	rowsAffected, _ := res.RowsAffected()
-	if rowsAffected == 0 {
-		http.Error(w, "photo not found", http.StatusNotFound)
+	// Build full photo object with ID for update
+	p.ID = id
+	fullPhoto := &models.Photo{
+		ID:           p.ID,
+		Title:        *p.Title,
+		FilePath:     p.FilePath,
+		AltText:      p.AltText,
+		DateTaken:    p.DateTaken,
+		Location:     p.Location,
+		Camera:       p.Camera,
+		Lens:         p.Lens,
+		Aperture:     p.Aperture,
+		ShutterSpeed: p.ShutterSpeed,
+		ISO:          p.ISO,
+		Visible:      p.Visible,
+		SortOrder:    p.SortOrder,
+	}
+
+	if err := c.service.Update(ctx, fullPhoto); err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "photo not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "failed to update photo", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -240,7 +140,7 @@ func handleEditPhoto(s *server.Server, w http.ResponseWriter, r *http.Request) {
 }
 
 // DELETE /api/photos/{id}
-func handleDeletePhoto(s *server.Server, w http.ResponseWriter, r *http.Request) {
+func (c *PhotoController) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
@@ -251,15 +151,12 @@ func handleDeletePhoto(s *server.Server, w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	res, err := s.DB.ExecContext(ctx, `DELETE FROM photos WHERE id = $1`, id)
-	if err != nil {
-		http.Error(w, "failed to delete photo", http.StatusInternalServerError)
-		return
-	}
-
-	rowsAffected, _ := res.RowsAffected()
-	if rowsAffected == 0 {
-		http.Error(w, "photo not found", http.StatusNotFound)
+	if err := c.service.DeleteByID(ctx, id); err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "photo not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "failed to delete photo", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -267,7 +164,7 @@ func handleDeletePhoto(s *server.Server, w http.ResponseWriter, r *http.Request)
 }
 
 // GET /api/photos/{id}/image
-func handleServeImage(s *server.Server, w http.ResponseWriter, r *http.Request) {
+func (c *PhotoController) ServeImage(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
@@ -278,17 +175,14 @@ func handleServeImage(s *server.Server, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var filePath string
-	err = s.DB.QueryRowContext(ctx, `SELECT file_path FROM photos WHERE id = $1`, id).Scan(&filePath)
+	var p *models.Photo
+	p, err = c.service.GetByID(ctx, id)
 	if err != nil {
 		http.Error(w, "photo not found", http.StatusNotFound)
 		return
 	}
 
-	// The volume is mounted at /photos
-	absPath := filepath.Join("/photos", filePath)
-	
-	// Log the path for debugging purposes
+	absPath := filepath.Join("/photos", p.FilePath)
 	fmt.Printf("Serving image from path: %s\n", absPath)
 
 	http.ServeFile(w, r, absPath)
