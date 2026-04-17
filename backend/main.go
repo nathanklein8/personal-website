@@ -6,9 +6,6 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	// "github.com/go-chi/cors"
-	_ "github.com/jackc/pgx/v5/stdlib"
-
 	"nklein.xyz/backend/routes"
 	"nklein.xyz/backend/server"
 )
@@ -29,21 +26,11 @@ func main() {
 	// Router
 	r := chi.NewRouter()
 
-	// r.Use(cors.Handler(cors.Options{
-	// 	AllowedOrigins: []string{
-	// 		"http://app:3000", // local docker hostname + internal port (bc of reverse proxy)
-	// 	},
-	// 	AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-	// 	AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-	// 	AllowCredentials: true,
-	// 	MaxAge:           300,
-	// }))
-
-	// Mount grouped routes
-	r.Mount("/api", routes.HealthRoutes(s))
-	r.Mount("/api/landingcard", routes.LandingCardRoutes(s))
-	r.Mount("/api/projects", routes.ProjectRoutes(s))
-	r.Mount("/api/photos", routes.PhotoRoutes(s))
+	// Initialize controllers with service layer
+	_ = routes.HealthRoutes(s)
+	_ = routes.LandingCardRoutes(s)
+	_ = routes.ProjectRoutes(s)
+	_ = routes.PhotoRoutes(s)
 
 	addr := ":8080"
 	fmt.Printf("🚀 Starting server on %s\n", addr)
