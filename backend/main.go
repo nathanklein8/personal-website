@@ -26,11 +26,11 @@ func main() {
 	// Router
 	r := chi.NewRouter()
 
-	// Initialize controllers with service layer
-	_ = routes.HealthRoutes(s)
-	_ = routes.LandingCardRoutes(s)
-	_ = routes.ProjectRoutes(s)
-	_ = routes.PhotoRoutes(s)
+	// Mount route sub-routers
+	r.Mount("/api", routes.HealthRoutes(s))
+	r.Mount("/api", routes.LandingCardRoutes(s))
+	r.Mount("/api", routes.ProjectRoutes(s))
+	r.Mount("/api", routes.PhotoRoutes(s))
 
 	addr := ":8080"
 	fmt.Printf("🚀 Starting server on %s\n", addr)

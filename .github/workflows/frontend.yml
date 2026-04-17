@@ -17,28 +17,22 @@ on:
       - '.github/workflows/database.yml'
 
 jobs:
-  build-and-deploy:
+  build-frontend:
     runs-on: self-hosted
-
-    # set which env to pull secrets/vars from
-    environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
 
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
-
       APP_PORT: ${{ vars.APP_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
-
-      # set api URL
-      # for dev, this should be localhost:<backend port>
-      # for test/prod, <backend container name>:<internal port (8080)>
       API_URL: 'http://backend:8080'
-      
+      IMAGE_TAG: "app-${{ github.ref_name == 'main' && 'prod' || 'test' }}:latest"
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Frontend Image
         uses: docker/build-push-action@v6
@@ -46,7 +40,61 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
-          tags: app:latest
+          load: true
+          tags: ${{ env.IMAGE_TAG }}, app:latest
+
+  deploy-frontend:
+    runs-on: self-hosted
+    needs: build-frontend
+
+    env:
+      ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
+      APP_PORT: ${{ vars.APP_PORT }}
+      PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
+      API_URL: 'http://backend:8080'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Save Frontend Image
+        run: |
+          docker save -p frontend-app.tar ${{ env.IMAGE_TAG }}, app:latest
+
+      - name: Upload frontend image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-image
+          path: frontend-app.tar
+          retention-days: 1
+
+  deploy-frontend-container:
+    runs-on: self-hosted
+    needs: deploy-frontend
+
+    env:
+      ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
+      APP_PORT: ${{ vars.APP_PORT }}
+      PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
+      API_URL: 'http://backend:8080'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-image
+          path: .
+
+      - name: Load Frontend Image
+        run: |
+          docker load -i frontend-app.tar
+          rm frontend-app.tar
 
       - name: Restart Frontend Service
         run: |
