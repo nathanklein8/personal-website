@@ -18,6 +18,7 @@
 		"db:apply": "source .env && DATABASE_URL=${DATABASE_URL} atlas migrate apply --dir \"file://backend/migrations\" --url ${DATABASE_URL}"
 	},
 	"devDependencies": {
+		"@nk/shared": "workspace:*",
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.36.0",
 		"@internationalized/date": "^3.8.1",
@@ -51,7 +52,6 @@
 		"vite": "^7.1.7"
 	},
 	"dependencies": {
-		"@nk/shared": "workspace:*",
 		"dotenv": "^17.2.3",
 		"embla-carousel-svelte": "^8.6.0",
 		"mode-watcher": "^1.1.0",

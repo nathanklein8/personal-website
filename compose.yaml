@@ -15,8 +15,9 @@ services:
 
   admin:
     container_name: pwsite-${ENV}-admin
-    build: 
-      context: ./admin
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
       args:
         # tell non ssl admin ui its origin so it c
         # can do svelte server side actions
