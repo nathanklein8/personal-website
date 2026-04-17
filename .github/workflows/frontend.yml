@@ -43,8 +43,8 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:latest
 
-      - name: touch file
-        run: touch ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
+      - name: Save image
+        run: docker save -o ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
