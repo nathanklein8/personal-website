@@ -69,7 +69,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.IMAGE_NAME }}
-          path: ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
+          path: ${{ runner.temp }}
 
       - name: Load image
         run: |

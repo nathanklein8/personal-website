@@ -8,7 +8,7 @@
 	import { TypeWriter } from 'svelte-typewrite';
 	import { Button } from '$lib/components/ui/button';
 	import type { PageProps } from './$types';
-	import ErrorCard from '$lib/components/error-card.svelte';
+	import ErrorCard from '@nk/shared/components/error-card';
 	import LandingCard from '$lib/components/landing-card.svelte';
 	import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '$lib/components/ui/carousel';
 

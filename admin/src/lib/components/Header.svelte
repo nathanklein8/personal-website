@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ModeToggle from '$lib/components/mode-toggle.svelte';
+	import ModeToggle from '@nk/shared/components/mode-toggle';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { Menu } from '@lucide/svelte';
 
