@@ -41,14 +41,7 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:latest
 
       - name: Save image
-        run: docker save -o ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
-
-      - name: Upload image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.IMAGE_NAME }}-image
-          path: ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
-          retention-days: 1
+        run: docker save -o /tmp/pwsite-images/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
 
   deploy-admin-container:
     runs-on: self-hosted
@@ -66,17 +59,11 @@ jobs:
       IMAGE_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin"
 
     steps:
-      - name: Download image artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.IMAGE_NAME }}-image
-          path: ${{ runner.temp }}
-
       - name: Load image
         run: |
-          docker load --input ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
+          docker load --input /tmp/pwsite-images/${{ env.IMAGE_NAME }}.tar
           docker image ls -a
-          rm ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
+          rm /tmp/pwsite-images/${{ env.IMAGE_NAME }}.tar
 
       - name: Restart Admin Service
         run: |
