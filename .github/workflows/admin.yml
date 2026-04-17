@@ -20,7 +20,7 @@ jobs:
       ADMIN_PORT: ${{ vars.ADMIN_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
       API_URL: 'http://backend:8080'
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin"
+      IMAGE_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin"
 
     steps:
       - uses: actions/checkout@v4
@@ -35,16 +35,16 @@ jobs:
           file: ./admin/Dockerfile
           push: false
           load: true
-          tags: ${{ env.IMAGE_TAG }}:latest
+          tags: ${{ env.IMAGE_NAME }}:latest
 
       - name: touch file
-        run: touch ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+        run: touch ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.IMAGE_TAG }}
-          path: ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+          name: ${{ env.IMAGE_NAME }}
+          path: ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
 
   deploy-admin-container:
     runs-on: self-hosted
@@ -56,20 +56,20 @@ jobs:
       ADMIN_PORT: ${{ vars.ADMIN_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
       API_URL: 'http://backend:8080'
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin:latest"
+      IMAGE_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin"
 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.IMAGE_TAG }}
-          path: ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+          name: ${{ env.IMAGE_NAME }}
+          path: ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
 
       - name: Load image
         run: |
-          docker load --input ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+          docker load --input ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
           docker image ls -a
-          rm ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+          rm ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
 
       - name: Restart Admin Service
         run: |

@@ -62,7 +62,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend:latest"
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend"
 
     steps:
       - name: Download artifact
