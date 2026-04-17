@@ -23,7 +23,7 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-      IMAGE_TAG: "backend-${{ github.ref_name == 'main' && 'prod' || 'test' }}:latest"
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend:latest"
 
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +39,8 @@ jobs:
           push: false
           load: true
           tags: ${{ env.IMAGE_TAG }}, backend:latest
+          labels:
+            - "environment=${{ github.ref_name }}"
 
   deploy-backend:
     runs-on: self-hosted
@@ -62,7 +64,7 @@ jobs:
 
       - name: Save Backend Image
         run: |
-          docker save -p backend-app.tar ${{ env.IMAGE_TAG }}, backend:latest
+          docker save -o backend-app.tar ${{ env.IMAGE_TAG }}, backend:latest
 
       - name: Upload backend image artifact
         uses: actions/upload-artifact@v4

@@ -20,7 +20,7 @@ jobs:
       ADMIN_PORT: ${{ vars.ADMIN_PORT }}
       PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
       API_URL: 'http://backend:8080'
-      IMAGE_TAG: "admin-${{ github.ref_name == 'main' && 'prod' || 'test' }}:latest"
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-admin:latest"
 
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +36,8 @@ jobs:
           push: false
           load: true
           tags: ${{ env.IMAGE_TAG }}, admin:latest
+          labels:
+            - "environment=${{ github.ref_name }}"
 
   deploy-admin:
     runs-on: self-hosted
@@ -56,7 +58,7 @@ jobs:
 
       - name: Save Admin Image
         run: |
-          docker save -p admin-app.tar ${{ env.IMAGE_TAG }}, admin:latest
+          docker save -o admin-app.tar ${{ env.IMAGE_TAG }}, admin:latest
 
       - name: Upload admin image artifact
         uses: actions/upload-artifact@v4
