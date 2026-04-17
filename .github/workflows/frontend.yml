@@ -43,6 +43,9 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_TAG }}
 
+      - name: touch file
+        run: touch ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
