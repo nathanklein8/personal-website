@@ -11,77 +11,57 @@ export function getURL() {
   return url;
 }
 
+export async function getLandingCard() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/landingcard');
+
+  if (res.ok) {
+    return await res.json();
+  }
+  console.error(`Unable to fetch landing card content, HTTP ${res.status}: ${res.statusText}`);
+  return { error: `Unable to fetch landing card content, HTTP ${res.status}: ${res.statusText}` };
+}
+
+export async function getProjects() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/projects');
+
+  if (res.ok) {
+    return await res.json();
+  }
+  console.error(`Unable to fetch projects, HTTP ${res.status}: ${res.statusText}`);
+  return [{ error: `Unable to fetch projects, HTTP ${res.status}: ${res.statusText}` }];
+}
+
+export async function getPhotos() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos');
+
+  let photos: any[] = [];
+  if (res.ok) {
+    const data = await res.json();
+    photos = data ?? [];
+  } else {
+    console.error(`Unable to fetch photos, HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  const visiblePhotos = photos.filter((p: any) => p.visible !== false);
+  return { visiblePhotos, featuredPhotos: visiblePhotos.slice(0, 3) };
+}
+
 export async function getContent() {
   const apiURL = getURL();
-
-  // endpoints to fetch
-  const landingCardEndpoint = apiURL + '/api/landingcard';
-  const projectsEndpoint = apiURL + '/api/projects';
-  const photosEndpoint = apiURL + '/api/photos';
-
-  // get promises for all endpoints
-  const [landingRes, projectsRes, photosRes] = await Promise.allSettled([
-    fetch(landingCardEndpoint),
-    fetch(projectsEndpoint),
-    fetch(photosEndpoint)
+  const [landingCard, { visiblePhotos, featuredPhotos }] = await Promise.all([
+    getLandingCard(),
+    getPhotos()
   ]);
-
-  // handle landing card promise
-  let landingCard: any = {};
-  if (landingRes.status === 'fulfilled') {
-    const res = landingRes.value;
-    if (res.ok) {
-      landingCard = await res.json();
-    } else {
-      console.error(`Unable to fetch landing card content, HTTP ${res.status}: ${res.statusText}`);
-      landingCard = { error: `Unable to fetch landing card content, HTTP ${res.status}: ${res.statusText}` };
-    }
-  } else {
-    console.error("Unable to reach backend:", landingRes.reason);
-    landingCard = { error: `Unable to reach backend: ${landingRes.reason}` };
-  }
-
-  // handle projects promise
-  let projects: any[] = [];
-  if (projectsRes.status === 'fulfilled') {
-    const res = projectsRes.value;
-    if (res.ok) {
-      projects = await res.json();
-    } else {
-      console.error(`Unable to fetch projects, HTTP ${res.status}: ${res.statusText}`);
-      projects = [{ error: `Unable to fetch projects, HTTP ${res.status}: ${res.statusText}` }];
-    }
-  } else {
-    console.error(`Unable to reach backend: ${projectsRes.reason}`);
-    projects = [{ error: `Unable to reach backend: ${projectsRes.reason}` }];
-  }
-
-  // handle photos promise
-  let photos: any[] = [];
-  if (photosRes.status === 'fulfilled') {
-    const res = photosRes.value;
-    if (res.ok) {
-      const data = await res.json();
-      // API returns null when table is empty
-      photos = data ?? [];
-    } else {
-      console.error(`Unable to fetch photos, HTTP ${res.status}: ${res.statusText}`);
-    }
-  } else {
-    console.error(`Unable to reach backend:`, photosRes.reason);
-  }
-
-  // Visible photos only (for gallery)
-  const visiblePhotos = photos.filter((p: any) => p.visible !== false) || [];
-
-  // Featured photos (first 3 for carousel)
-  const featuredPhotos = (visiblePhotos ?? []).slice(0, 3);
+  const projects = await getProjects();
 
   return {
     landingCard,
     projects,
     photos: visiblePhotos,
     featuredPhotos,
-    apiURL: apiURL
+    apiURL
   };
 }
