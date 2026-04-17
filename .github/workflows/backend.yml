@@ -38,10 +38,15 @@ jobs:
           file: ./backend/Dockerfile
           push: false
           load: true
-          tags: ${{ env.IMAGE_TAG }}, backend:latest
-          labels: "environment=${{ github.ref_name }}"
+          tags: ${{ env.IMAGE_TAG }}
 
-  deploy-backend:
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.IMAGE_TAG }}
+          path: ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+
+  deploy-backend-container:
     runs-on: self-hosted
     needs: build-backend
 
@@ -54,51 +59,20 @@ jobs:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      IMAGE_TAG: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-backend:latest"
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Save Backend Image
-        run: |
-          docker save -o backend-app.tar ${{ env.IMAGE_TAG }}, backend:latest
-
-      - name: Upload backend image artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-image
-          path: backend-app.tar
-          retention-days: 1
-
-  deploy-backend-container:
-    runs-on: self-hosted
-    needs: deploy-backend
-
-    env:
-      ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
-      COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
-      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
-      PHOTO_LIBRARY: ${{ vars.PHOTO_LIBRARY }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download backend image artifact
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: backend-image
-          path: .
+          name: ${{ env.IMAGE_TAG }}
+          path: ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
 
-      - name: Load Backend Image
+      - name: Load image
         run: |
-          docker load -i backend-app.tar
-          rm backend-app.tar
+          docker load --input ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
+          docker image ls -a
+          rm ${{ runner.temp }}/${{ env.IMAGE_TAG }}.tar
 
       - name: Restart Backend Service
         run: |
