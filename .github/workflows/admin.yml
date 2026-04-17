@@ -36,8 +36,7 @@ jobs:
           push: false
           load: true
           tags: ${{ env.IMAGE_TAG }}, admin:latest
-          labels:
-            - "environment=${{ github.ref_name }}"
+          labels: "environment=${{ github.ref_name }}"
 
   deploy-admin:
     runs-on: self-hosted
