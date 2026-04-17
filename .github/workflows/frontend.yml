@@ -20,6 +20,9 @@ jobs:
   build-frontend:
     runs-on: self-hosted
 
+    # set which env to pull secrets/vars from
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
+
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
       COMPOSE_PROJECT_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}"
@@ -46,15 +49,12 @@ jobs:
       - name: Save image
         run: docker save -o ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.IMAGE_NAME }}
-          path: ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
-
   deploy-frontend-container:
     runs-on: self-hosted
     needs: build-frontend
+
+    # set which env to pull secrets/vars from
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
 
     env:
       ENV: ${{ github.ref_name == 'main' && 'prod' || 'test' }}
@@ -65,12 +65,6 @@ jobs:
       IMAGE_NAME: "pwsite-${{ github.ref_name == 'main' && 'prod' || 'test' }}-app"
 
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.IMAGE_NAME }}
-          path: ${{ runner.temp }}
-
       - name: Load image
         run: |
           docker load --input ${{ runner.temp }}/${{ env.IMAGE_NAME }}.tar
