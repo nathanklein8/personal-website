@@ -104,15 +104,15 @@
 
 	<div class="grid gap-8 justify-items-center px-4 w-full">
 		{#if data.featuredPhotos && data.featuredPhotos.length > 0}
-			<Carousel class="max-w-[85vw]" opts={{ loop: true }}>
+			<Carousel class="max-w-[min(600px,80vw)]" opts={{ loop: true }}>
 				<CarouselContent class="">
 					{#each data.featuredPhotos as photo, index}
 						<CarouselItem class="basis-auto">
-							<div class="w-[50vw] md:w-[75vw] bg-muted flex items-center justify-center overflow-hidden">
+							<div class="w-full bg-muted flex items-center justify-center overflow-hidden">
 								<img
 									src={`${data.apiURL}/api/photos/${photo.id}/image`}
 									alt={photo.altText || photo.title}
-									class="aspect-3/2 object-contain w-full h-full"
+									class="aspect-3/2 object-cover w-full max-h-[80vh]"
 								/>
 							</div>
 						</CarouselItem>
