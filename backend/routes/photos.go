@@ -39,6 +39,7 @@ func PhotoRoutes(s *server.Server) chi.Router {
 
 	// CRUD routes
 	r.Get("/", controller.GetAll)
+	r.Get("/{id}/thumbnail", controller.ServeThumbnail)
 	r.Post("/", controller.AddPhoto)
 	r.Put("/{id}", controller.Update)
 	r.Delete("/{id}", controller.DeleteByID)
@@ -134,6 +135,38 @@ func (c *PhotoController) ServePreview(w http.ResponseWriter, r *http.Request) {
 }
 
 // --- CRUD Operations ---
+
+// GET /api/photos/{id}/thumbnail - Serve medium preview for a photo
+func (c *PhotoController) ServeThumbnail(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		http.Error(w, "invalid photo ID", http.StatusBadRequest)
+		return
+	}
+
+	p, err := c.service.GetByID(ctx, id)
+	if err != nil {
+		http.Error(w, "photo not found", http.StatusNotFound)
+		return
+	}
+
+	if p.MediumPath == nil {
+		http.Error(w, "no thumbnail available", http.StatusNotFound)
+		return
+	}
+
+	servePath := filepath.Join("/thumbnails", *p.MediumPath)
+	if _, err := os.Stat(servePath); os.IsNotExist(err) {
+		http.Error(w, "thumbnail not found", http.StatusNotFound)
+		return
+	}
+
+	http.ServeFile(w, r, servePath)
+}
 
 // GET /api/photos - List all photos in the database
 func (c *PhotoController) GetAll(w http.ResponseWriter, r *http.Request) {

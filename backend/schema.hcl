@@ -123,6 +123,7 @@ table "photos" {
   column "source_path" {
     type = text
     null = false
+    default = ""
     // relative path to original file in photo library volume, e.g. "2024/summer-vacation/beach.jpg"
   }
   column "thumbnail_path" {
