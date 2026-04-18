@@ -49,19 +49,8 @@ export async function getPhotos() {
   return { visiblePhotos, featuredPhotos: visiblePhotos.slice(0, 3) };
 }
 
-export async function getContent() {
+export async function getContent<T extends readonly (() => Promise<any>)[]>(...getters: T) {
   const apiURL = getURL();
-  const [landingCard, { visiblePhotos, featuredPhotos }] = await Promise.all([
-    getLandingCard(),
-    getPhotos()
-  ]);
-  const projects = await getProjects();
-
-  return {
-    landingCard,
-    projects,
-    photos: visiblePhotos,
-    featuredPhotos,
-    apiURL
-  };
+  const results = await Promise.all(getters.map(fn => fn()));
+  return { apiURL, results };
 }
