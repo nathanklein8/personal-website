@@ -13,5 +13,8 @@ CREATE TABLE "public"."photos" (
   "iso" text NULL,
   "visible" boolean NOT NULL DEFAULT true,
   "sort_order" integer NOT NULL DEFAULT 0,
+  "source_path" text NOT NULL,
+  "thumbnail_path" text NULL,
+  "medium_path" text NULL,
   PRIMARY KEY ("id")
 );

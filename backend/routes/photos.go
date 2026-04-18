@@ -3,8 +3,8 @@ package routes
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -29,16 +29,113 @@ func PhotoRoutes(s *server.Server) chi.Router {
 	r := chi.NewRouter()
 	controller := NewPhotoController(service.NewPhotoService(repository.NewPhotoRepository(s.DB)))
 
+	// File explorer browsing routes
+	r.Group(func(r chi.Router) {
+		r.Get("/available", controller.ListYears)
+		r.Get("/available/{year}", controller.ListEvents)
+		r.Get("/available/{year}/{event}", controller.ListPhotos)
+		r.Get("/available/{year}/{event}/{filename}/preview", controller.ServePreview)
+	})
+
+	// CRUD routes
 	r.Get("/", controller.GetAll)
-	r.Post("/", controller.Create)
+	r.Post("/", controller.AddPhoto)
 	r.Put("/{id}", controller.Update)
 	r.Delete("/{id}", controller.DeleteByID)
-	r.Get("/{id}/image", controller.ServeImage)
+	r.Post("/regenerate-thumbnails", controller.RegenerateThumbnails)
 
 	return r
 }
 
-// GET /api/photos
+// --- File Explorer Browsing ---
+
+// GET /api/photos/available - List year directories
+func (c *PhotoController) ListYears(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	years, err := c.service.ListYears(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(years)
+}
+
+// GET /api/photos/available/{year} - List event directories within a year
+func (c *PhotoController) ListEvents(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	year := chi.URLParam(r, "year")
+	events, err := c.service.ListEvents(ctx, year)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(events)
+}
+
+// GET /api/photos/available/{year}/{event} - List .jpg filenames
+func (c *PhotoController) ListPhotos(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+	defer cancel()
+
+	year := chi.URLParam(r, "year")
+	event := chi.URLParam(r, "event")
+	photos, err := c.service.ListPhotos(ctx, year, event)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(photos)
+}
+
+// GET /api/photos/available/{year}/{event}/{filename}/preview - Serve thumbnail or medium preview
+func (c *PhotoController) ServePreview(w http.ResponseWriter, r *http.Request) {
+	year := chi.URLParam(r, "year")
+	event := chi.URLParam(r, "event")
+	filename := chi.URLParam(r, "filename")
+
+	// Determine the base filename and requested size
+	var base, servePath string
+	if filepath.Ext(filename) == "_thumb.jpg" {
+		base = filename[:len(filename)-len("_thumb.jpg")] + ".jpg"
+		servePath = filepath.Join("/thumbnails", year, event, base+"_thumb.jpg")
+	} else if filepath.Ext(filename) == "_med.jpg" {
+		base = filename[:len(filename)-len("_med.jpg")] + ".jpg"
+		servePath = filepath.Join("/thumbnails", year, event, base+"_med.jpg")
+	} else {
+		base = filename
+		servePath = filepath.Join("/thumbnails", year, event, base+"_med.jpg")
+	}
+
+	// Check if preview file exists, generate if not
+	if _, err := os.Stat(servePath); os.IsNotExist(err) {
+		sourceAbsPath := filepath.Join("/photos", year, event, base)
+		thumbAbsPath := filepath.Join("/thumbnails", year, event, base+"_thumb.jpg")
+		mediumAbsPath := filepath.Join("/thumbnails", year, event, base+"_med.jpg")
+
+		if _, err := os.Stat(sourceAbsPath); os.IsNotExist(err) {
+			http.Error(w, "source image not found", http.StatusNotFound)
+			return
+		}
+
+		if err := c.service.GenerateThumbnails(sourceAbsPath, thumbAbsPath, mediumAbsPath); err != nil {
+			http.Error(w, "failed to generate preview", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	http.ServeFile(w, r, servePath)
+}
+
+// --- CRUD Operations ---
+
+// GET /api/photos - List all photos in the database
 func (c *PhotoController) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
@@ -52,38 +149,41 @@ func (c *PhotoController) GetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(photos)
 }
 
-// POST /api/photos
-func (c *PhotoController) Create(w http.ResponseWriter, r *http.Request) {
+// POST /api/photos - Add a photo from the file explorer
+func (c *PhotoController) AddPhoto(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
-	var p models.Photo
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+	var req models.AddPhotoRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	if err := c.service.ValidatePhotoCreate(&models.PhotoCreateRequest{
-		Title:    &p.Title,
-		FilePath: p.FilePath,
-	}); err != nil {
+	if req.Filename == "" {
+		http.Error(w, "filename is required", http.StatusBadRequest)
+		return
+	}
+	if req.Title == "" {
+		http.Error(w, "title is required", http.StatusBadRequest)
+		return
+	}
+
+	photo, err := c.service.AddPhoto(ctx, req)
+	if err != nil {
 		if apiErr, ok := err.(*service.APIError); ok {
 			http.Error(w, apiErr.Message, apiErr.Status)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	if err := c.service.Create(ctx, &p); err != nil {
-		http.Error(w, "failed to insert photo", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(p)
+	json.NewEncoder(w).Encode(photo)
 }
 
-// PUT /api/photos/{id}
+// PUT /api/photos/{id} - Update caption and ordering
 func (c *PhotoController) Update(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
@@ -95,39 +195,13 @@ func (c *PhotoController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p models.PhotoUpdateRequest
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
+	var req models.PhotoUpdateRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	if err := c.service.ValidatePhotoUpdate(&p); err != nil {
-		if apiErr, ok := err.(*service.APIError); ok {
-			http.Error(w, apiErr.Message, apiErr.Status)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	// Build full photo object with ID for update
-	p.ID = id
-	fullPhoto := &models.Photo{
-		ID:           p.ID,
-		Title:        *p.Title,
-		FilePath:     p.FilePath,
-		AltText:      p.AltText,
-		DateTaken:    p.DateTaken,
-		Location:     p.Location,
-		Camera:       p.Camera,
-		Lens:         p.Lens,
-		Aperture:     p.Aperture,
-		ShutterSpeed: p.ShutterSpeed,
-		ISO:          p.ISO,
-		Visible:      p.Visible,
-		SortOrder:    p.SortOrder,
-	}
-
-	if err := c.service.Update(ctx, fullPhoto); err != nil {
+	if err := c.service.Update(ctx, id, req); err != nil {
 		if err == sql.ErrNoRows {
 			http.Error(w, "photo not found", http.StatusNotFound)
 		} else {
@@ -139,7 +213,7 @@ func (c *PhotoController) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// DELETE /api/photos/{id}
+// DELETE /api/photos/{id} - Delete photo DB row and generated thumbnails
 func (c *PhotoController) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
@@ -163,27 +237,15 @@ func (c *PhotoController) DeleteByID(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// GET /api/photos/{id}/image
-func (c *PhotoController) ServeImage(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+// POST /api/photos/regenerate-thumbnails - Regenerate all thumbnails
+func (c *PhotoController) RegenerateThumbnails(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), 30*time.Second)
 	defer cancel()
 
-	idParam := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		http.Error(w, "invalid photo ID", http.StatusBadRequest)
+	if err := c.service.RegenerateAllThumbnails(ctx); err != nil {
+		http.Error(w, "failed to regenerate thumbnails", http.StatusInternalServerError)
 		return
 	}
 
-	var p *models.Photo
-	p, err = c.service.GetByID(ctx, id)
-	if err != nil {
-		http.Error(w, "photo not found", http.StatusNotFound)
-		return
-	}
-
-	absPath := filepath.Join("/photos", p.FilePath)
-	fmt.Printf("Serving image from path: %s\n", absPath)
-
-	http.ServeFile(w, r, absPath)
+	w.WriteHeader(http.StatusNoContent)
 }

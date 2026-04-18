@@ -120,6 +120,21 @@ table "photos" {
     null = false
     default = 0
   }
+  column "source_path" {
+    type = text
+    null = false
+    // relative path to original file in photo library volume, e.g. "2024/summer-vacation/beach.jpg"
+  }
+  column "thumbnail_path" {
+    type = text
+    null = true
+    // relative path to thumbnail in thumbnails volume, e.g. "2024/summer-vacation/beach.jpg_thumb.jpg"
+  }
+  column "medium_path" {
+    type = text
+    null = true
+    // relative path to medium preview in thumbnails volume, e.g. "2024/summer-vacation/beach.jpg_med.jpg"
+  }
   primary_key {
     columns = [column.id]
   }

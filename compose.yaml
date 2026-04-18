@@ -43,6 +43,7 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
     volumes:
       - "${PHOTO_LIBRARY:-/photos}:/photos:ro"
+      - photos-thumbnails:/thumbnails
 
   db:
     container_name: pwsite-${ENV}-db
@@ -65,3 +66,5 @@ networks:
 volumes:
   db-data:
     name: pwsite-${ENV}-db-data
+  photos-thumbnails:
+    name: pwsite-${ENV}-photos-thumbnails
