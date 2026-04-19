@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { getPhotos, getURL } from '@nk/shared/server/backend';
+import { getVisiblePhotos, getURL } from '@nk/shared/server/backend';
 
 export const load: PageServerLoad = async () => {
-    const { visiblePhotos: photos } = await getPhotos();
+    const photos = await getVisiblePhotos();
     const apiURL = getURL();
     return { 
         photos,

@@ -115,6 +115,11 @@ table "photos" {
     null = false
     default = true
   }
+  column "featured" {
+    type = boolean
+    null = false
+    default = false
+  }
   column "sort_order" {
     type = integer
     null = false

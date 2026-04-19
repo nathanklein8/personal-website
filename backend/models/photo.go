@@ -13,7 +13,7 @@ type Photo struct {
 	ShutterSpeed *string `json:"shutterSpeed,omitempty"`
 	ISO          *string `json:"iso,omitempty"`
 	Visible      bool    `json:"visible"`
-	Featured     bool    `json:"featured,omitempty"`
+	Featured     bool    `json:"featured"`
 	SortOrder    int     `json:"sortOrder"`
 	SourcePath   string  `json:"sourcePath"`
 	ThumbnailPath *string `json:"thumbnailPath,omitempty"`
@@ -27,10 +27,11 @@ type PhotoCreateRequest struct {
 }
 
 type PhotoUpdateRequest struct {
-	ID        int    `json:"id,omitempty"`
+	ID        int     `json:"id,omitempty"`
 	Title     *string `json:"title,omitempty"`
 	SortOrder *int    `json:"sortOrder,omitempty"`
 	Visible   *bool   `json:"visible,omitempty"`
+	Featured  *bool   `json:"featured,omitempty"`
 }
 
 // DirectoryEntry represents a directory listing for the file explorer

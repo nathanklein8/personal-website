@@ -1,13 +1,13 @@
 import type { Actions, PageServerLoad } from './$types';
-import { getContent, getLandingCard, getProjects, getPhotos, getURL } from '@nk/shared/server/backend';
+import { getContent, getLandingCard, getProjects, getAllPhotos, getFeaturedPhotos, getURL } from '@nk/shared/server/backend';
 
 export const load: PageServerLoad = async () => {
-    const { apiURL, results } = await getContent(getLandingCard, getProjects, getPhotos);
-    const [landingCard, projects, { visiblePhotos, featuredPhotos }] = results;
+    const { apiURL, results } = await getContent(getLandingCard, getProjects, getAllPhotos, getFeaturedPhotos);
+    const [landingCard, projects, photos, featuredPhotos] = results;
     return {
         landingCard,
         projects,
-        photos: visiblePhotos,
+        photos,
         featuredPhotos,
         apiURL
     };

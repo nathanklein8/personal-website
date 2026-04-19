@@ -168,12 +168,28 @@ func (c *PhotoController) ServeThumbnail(w http.ResponseWriter, r *http.Request)
 	http.ServeFile(w, r, servePath)
 }
 
-// GET /api/photos - List all photos in the database
+// GET /api/photos - List photos based on query parameter
+// ?type=all -> all photos (admin)
+// ?type=visible -> only visible photos (public gallery)
+// ?type=featured -> only visible and featured photos (landing page)
+// no parameter -> all photos (default for backwards compatibility)
 func (c *PhotoController) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 	defer cancel()
 
-	photos, err := c.service.GetAll(ctx)
+	photoType := r.URL.Query().Get("type")
+	var photos []models.Photo
+	var err error
+
+	switch photoType {
+	case "visible":
+		photos, err = c.service.GetVisible(ctx)
+	case "featured":
+		photos, err = c.service.GetFeatured(ctx)
+	default:
+		photos, err = c.service.GetAll(ctx)
+	}
+
 	if err != nil {
 		http.Error(w, "failed to fetch photos", http.StatusInternalServerError)
 		return

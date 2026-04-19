@@ -33,6 +33,51 @@ export async function getProjects() {
   return [{ error: `Unable to fetch projects, HTTP ${res.status}: ${res.statusText}` }];
 }
 
+export async function getAllPhotos() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos?type=all');
+
+  let photos: any[] = [];
+  if (res.ok) {
+    const data = await res.json();
+    photos = data ?? [];
+  } else {
+    console.error(`Unable to fetch all photos, HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return photos;
+}
+
+export async function getVisiblePhotos() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos?type=visible');
+
+  let photos: any[] = [];
+  if (res.ok) {
+    const data = await res.json();
+    photos = data ?? [];
+  } else {
+    console.error(`Unable to fetch visible photos, HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return photos;
+}
+
+export async function getFeaturedPhotos() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos?type=featured');
+
+  let photos: any[] = [];
+  if (res.ok) {
+    const data = await res.json();
+    photos = data ?? [];
+  } else {
+    console.error(`Unable to fetch featured photos, HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return photos;
+}
+
 export async function getPhotos() {
   const apiURL = getURL();
   const res = await fetch(apiURL + '/api/photos');
@@ -45,8 +90,7 @@ export async function getPhotos() {
     console.error(`Unable to fetch photos, HTTP ${res.status}: ${res.statusText}`);
   }
 
-  const visiblePhotos = photos.filter((p: any) => p.visible !== false);
-  return { visiblePhotos, featuredPhotos: visiblePhotos.slice(0, 3) };
+  return { photos, featuredPhotos: photos.filter((p: any) => p.visible !== false).slice(0, 3) };
 }
 
 export async function getContent<T extends readonly (() => Promise<any>)[]>(...getters: T) {

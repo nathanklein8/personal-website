@@ -1,12 +1,11 @@
 import type { Actions, PageServerLoad } from './$types';
-import { getPhotos, getURL } from '@nk/shared/server/backend';
+import { getAllPhotos, getURL } from '@nk/shared/server/backend';
 
 export const load: PageServerLoad = async () => {
-    const { visiblePhotos: photos } = await getPhotos();
+    const photos = await getAllPhotos();
     return {
-        photos,
-        apiURL: process.env.API_URL
-    }
+        photos
+    };
 };
 
 export const actions: Actions = {
@@ -79,7 +78,7 @@ export const actions: Actions = {
 
     regenerateThumbnails: async () => {
         const apiURL = getURL();
-        const res = await fetch(`${apiURL}/api/photos/regenerate-thumbnails`, {
+        const res = await fetch(`${apiURL}/photos/regenerate-thumbnails`, {
             method: "POST"
         });
 
@@ -88,5 +87,58 @@ export const actions: Actions = {
             return { failure: true, message: body || `Backend error: ${res.status}` };
         }
         return { success: true };
+    },
+
+    availableYears: async () => {
+        const apiURL = getURL();
+        const res = await fetch(`${apiURL}/photos/available`);
+        if (!res.ok) {
+            return { failure: true, message: `Failed to load years: ${res.status}` };
+        }
+        const years = await res.json();
+        return { success: true, years };
+    },
+
+    availableEvents: async ({ request }) => {
+        const apiURL = getURL();
+        const formData = await request.formData();
+        const year = formData.get('year')?.toString();
+        if (!year) {
+            return { failure: true, message: 'No year specified' };
+        }
+        const res = await fetch(`${apiURL}/photos/available/${encodeURIComponent(year)}`);
+        if (!res.ok) {
+            return { failure: true, message: `Failed to load events: ${res.status}` };
+        }
+        const events = await res.json();
+        return { success: true, events };
+    },
+
+    availablePhotos: async ({ request }) => {
+        const apiURL = getURL();
+        const formData = await request.formData();
+        const year = formData.get('year')?.toString();
+        const event = formData.get('event')?.toString();
+        if (!year || !event) {
+            return { failure: true, message: 'Year and event required' };
+        }
+        const res = await fetch(`${apiURL}/photos/available/${encodeURIComponent(year)}/${encodeURIComponent(event)}`);
+        if (!res.ok) {
+            return { failure: true, message: `Failed to load photos: ${res.status}` };
+        }
+        const photos = await res.json();
+        return { success: true, photos };
+    },
+
+    selectPhoto: async ({ request }) => {
+        const apiURL = getURL();
+        const formData = await request.formData();
+        const year = formData.get('year')?.toString();
+        const event = formData.get('event')?.toString();
+        const filename = formData.get('filename')?.toString();
+        if (!year || !event || !filename) {
+            return { failure: true, message: 'Year, event, and filename required' };
+        }
+        return { success: true, year, event, filename };
     }
 };

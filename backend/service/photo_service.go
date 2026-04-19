@@ -179,6 +179,14 @@ func (s *PhotoService) GetAll(ctx context.Context) ([]models.Photo, error) {
 	return s.repo.GetAll(ctx)
 }
 
+func (s *PhotoService) GetVisible(ctx context.Context) ([]models.Photo, error) {
+	return s.repo.GetVisible(ctx)
+}
+
+func (s *PhotoService) GetFeatured(ctx context.Context) ([]models.Photo, error) {
+	return s.repo.GetFeatured(ctx)
+}
+
 func (s *PhotoService) GetByID(ctx context.Context, id int) (*models.Photo, error) {
 	return s.repo.GetByID(ctx, id)
 }
@@ -256,6 +264,9 @@ func (s *PhotoService) Update(ctx context.Context, id int, req models.PhotoUpdat
 	}
 	if req.Visible != nil {
 		existing.Visible = *req.Visible
+	}
+	if req.Featured != nil {
+		existing.Featured = *req.Featured
 	}
 
 	return s.repo.Update(ctx, existing)

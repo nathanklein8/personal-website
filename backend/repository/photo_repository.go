@@ -17,7 +17,7 @@ func NewPhotoRepository(db *sql.DB) *PhotoRepository {
 
 func (r *PhotoRepository) GetAll(ctx context.Context) ([]models.Photo, error) {
 	query := `SELECT id, title, file_path, alt_text, date_taken, location,
-	          camera, lens, aperture, shutter_speed, iso, visible, sort_order,
+	          camera, lens, aperture, shutter_speed, iso, visible, featured, sort_order,
 	          source_path, thumbnail_path, medium_path
 	          FROM photos ORDER BY sort_order ASC, id ASC`
 
@@ -43,6 +43,91 @@ func (r *PhotoRepository) GetAll(ctx context.Context) ([]models.Photo, error) {
 			&p.ShutterSpeed,
 			&p.ISO,
 			&p.Visible,
+			&p.Featured,
+			&p.SortOrder,
+			&p.SourcePath,
+			&p.ThumbnailPath,
+			&p.MediumPath,
+		); err != nil {
+			return nil, err
+		}
+		photos = append(photos, p)
+	}
+
+	return photos, rows.Err()
+}
+
+func (r *PhotoRepository) GetVisible(ctx context.Context) ([]models.Photo, error) {
+	query := `SELECT id, title, file_path, alt_text, date_taken, location,
+	          camera, lens, aperture, shutter_speed, iso, visible, featured, sort_order,
+	          source_path, thumbnail_path, medium_path
+	          FROM photos WHERE visible = true ORDER BY sort_order ASC, id ASC`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var photos []models.Photo
+	for rows.Next() {
+		var p models.Photo
+		if err := rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.FilePath,
+			&p.AltText,
+			&p.DateTaken,
+			&p.Location,
+			&p.Camera,
+			&p.Lens,
+			&p.Aperture,
+			&p.ShutterSpeed,
+			&p.ISO,
+			&p.Visible,
+			&p.Featured,
+			&p.SortOrder,
+			&p.SourcePath,
+			&p.ThumbnailPath,
+			&p.MediumPath,
+		); err != nil {
+			return nil, err
+		}
+		photos = append(photos, p)
+	}
+
+	return photos, rows.Err()
+}
+
+func (r *PhotoRepository) GetFeatured(ctx context.Context) ([]models.Photo, error) {
+	query := `SELECT id, title, file_path, alt_text, date_taken, location,
+	          camera, lens, aperture, shutter_speed, iso, visible, featured, sort_order,
+	          source_path, thumbnail_path, medium_path
+	          FROM photos WHERE visible = true AND featured = true ORDER BY sort_order ASC, id ASC`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var photos []models.Photo
+	for rows.Next() {
+		var p models.Photo
+		if err := rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.FilePath,
+			&p.AltText,
+			&p.DateTaken,
+			&p.Location,
+			&p.Camera,
+			&p.Lens,
+			&p.Aperture,
+			&p.ShutterSpeed,
+			&p.ISO,
+			&p.Visible,
+			&p.Featured,
 			&p.SortOrder,
 			&p.SourcePath,
 			&p.ThumbnailPath,
@@ -58,7 +143,7 @@ func (r *PhotoRepository) GetAll(ctx context.Context) ([]models.Photo, error) {
 
 func (r *PhotoRepository) GetByID(ctx context.Context, id int) (*models.Photo, error) {
 	query := `SELECT id, title, file_path, alt_text, date_taken, location,
-	          camera, lens, aperture, shutter_speed, iso, visible, sort_order,
+	          camera, lens, aperture, shutter_speed, iso, visible, featured, sort_order,
 	          source_path, thumbnail_path, medium_path
 	          FROM photos WHERE id = $1`
 
@@ -76,6 +161,7 @@ func (r *PhotoRepository) GetByID(ctx context.Context, id int) (*models.Photo, e
 		&p.ShutterSpeed,
 		&p.ISO,
 		&p.Visible,
+		&p.Featured,
 		&p.SortOrder,
 		&p.SourcePath,
 		&p.ThumbnailPath,
@@ -92,8 +178,8 @@ func (r *PhotoRepository) GetByID(ctx context.Context, id int) (*models.Photo, e
 func (r *PhotoRepository) Create(ctx context.Context, p *models.Photo) error {
 	var id int
 	err := r.db.QueryRowContext(ctx, `
-		INSERT INTO photos (title, file_path, alt_text, date_taken, location, camera, lens, aperture, shutter_speed, iso, visible, sort_order, source_path, thumbnail_path, medium_path)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+		INSERT INTO photos (title, file_path, alt_text, date_taken, location, camera, lens, aperture, shutter_speed, iso, visible, featured, sort_order, source_path, thumbnail_path, medium_path)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
 		RETURNING id
 	`,
 		p.Title,
@@ -107,6 +193,7 @@ func (r *PhotoRepository) Create(ctx context.Context, p *models.Photo) error {
 		p.ShutterSpeed,
 		p.ISO,
 		p.Visible,
+		p.Featured,
 		p.SortOrder,
 		p.SourcePath,
 		p.ThumbnailPath,
@@ -126,9 +213,9 @@ func (r *PhotoRepository) Update(ctx context.Context, p *models.Photo) error {
 		UPDATE photos
 		SET title = $1, file_path = $2, alt_text = $3, date_taken = $4,
 			location = $5, camera = $6, lens = $7, aperture = $8,
-			shutter_speed = $9, iso = $10, visible = $11, sort_order = $12,
-			source_path = $13, thumbnail_path = $14, medium_path = $15
-		WHERE id = $16
+			shutter_speed = $9, iso = $10, visible = $11, featured = $12, sort_order = $13,
+			source_path = $14, thumbnail_path = $15, medium_path = $16
+		WHERE id = $17
 	`,
 		p.Title,
 		p.FilePath,
@@ -141,6 +228,7 @@ func (r *PhotoRepository) Update(ctx context.Context, p *models.Photo) error {
 		p.ShutterSpeed,
 		p.ISO,
 		p.Visible,
+		p.Featured,
 		p.SortOrder,
 		p.SourcePath,
 		p.ThumbnailPath,
