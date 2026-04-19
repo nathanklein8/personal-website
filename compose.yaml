@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: admin/Dockerfile
       args:
-        # tell non ssl admin ui its origin so it c
+        # tell non ssl admin ui its origin so it
         # can do svelte server side actions
         # different for test/prod
         PORT: ${ADMIN_PORT}

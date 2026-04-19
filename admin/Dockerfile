@@ -1,5 +1,7 @@
 # Build from root context to resolve workspace dependencies
 FROM oven/bun:latest AS builder
+
+ARG PORT
 WORKDIR /app
 
 # Copy root workspace config and lockfile
