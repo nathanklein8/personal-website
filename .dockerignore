@@ -14,8 +14,7 @@ Dockerfile*
 # Node
 node_modules/
 
-# Bun
-bun.lock*
+# Bun (but not lockfile - Dockerfile needs it)
 
 # IDE
 .vscode/
