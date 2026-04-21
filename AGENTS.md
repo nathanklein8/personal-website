@@ -69,10 +69,18 @@ A personal portfolio website built with SvelteKit (frontend) and Go (backend), d
 │   ├── {year}/          # Year directories
 │   │   └── {event}/     # Event directories
 │   │       └── *.jpg    # Photo files
+├── packages/shared/     # Shared UI components & utils (@nk/shared)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ui/       # Shadcn/ui components (shared between apps)
+│   │   │   ├── error-card.svelte
+│   │   │   └── mode-toggle.svelte
+│   │   ├── server/
+│   │   └── utils.ts
 ├── src/                 # Main app (SvelteKit)
 │   ├── routes/         # Public pages (landing, projects, photography)
 │   ├── lib/
-│   │   ├── components/ # Shared components
+│   │   ├── components/ # App-specific components
 │   │   ├── server/     # Backend client
 │   │   └── utils.ts
 ├── compose.yaml         # Docker Compose configuration
@@ -215,15 +223,16 @@ The preview endpoint (GET /available/{year}/{event}/{filename}/preview) auto-gen
 </frontend-routes>
 
 <shared-components>
+- packages/shared/src/components/error-card.svelte - Error display
+- packages/shared/src/components/mode-toggle.svelte - Theme toggle
 - src/lib/components/landing-card.svelte - Bio/social display
 - src/lib/components/project-card.svelte - Project showcase
 - src/lib/components/photo-info.svelte - Photo details dialog
-- src/lib/components/error-card.svelte - Error display
-- src/lib/components/Header.svelte - Navigation
+- src/lib/components/Header.svelte - Navigation (both apps)
 </shared-components>
 
-<ui-components>src/lib/components/ui/
-- button, card, dialog, carousel, sheet, tooltip, scroll-area, separator, badge, alert, dropdown-menu
+<ui-components>packages/shared/src/components/ui/
+- alert, badge, button, card, carousel, dialog, dropdown-menu, scroll-area, separator, sheet, tooltip
 </ui-components>
 
 <backend-models>
@@ -270,27 +279,27 @@ Used by service layer for validation errors; controllers check for this type and
 <development-commands>
 ```bash
 # Start dev servers
-npm run dev              # Frontend + backend (via Docker)
+bun run dev              # Frontend + backend (via Docker)
 
 # Database operations
-npm run db:start         # Start PostgreSQL container
-npm run db:diff          # Generate migration SQL
-npm run db:apply         # Apply migrations
+bun run db:start         # Start PostgreSQL container
+bun run db:diff          # Generate migration SQL
+bun run db:apply         # Apply migrations
 
 # Code quality
-npm run check            # Type check
-npm run lint             # Prettier + ESLint
-npm run format           # Format code
+bun run check            # Type check
+bun run lint             # Prettier + ESLint
+bun run format           # Format code
 
 # Build
-npm run build            # Production build
-npm run preview          # Preview production build
+bun run build            # Production build
+bun run preview          # Preview production build
 ```
 
 <admin-panel>
 ```bash
 cd admin
-npm run dev              # Admin panel dev server
+bun run dev              # Admin panel dev server
 ```
 </admin-panel>
 
