@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
-	import { getAllPhotos } from '@nk/shared/server/backend';
 
-	let { data, form, errors }: PageData & { form: ActionData; errors: ActionData } = $props();
+	let { data, form }: PageData & { form: ActionData } = $props();
 
 	// State management
 	let showBrowser = $state(false);
@@ -14,59 +14,60 @@
 	let addSuccess = $state<string | null>(null);
 	let addError = $state<string | null>(null);
 
-	// Data from API
-	let years = $state<string[]>([]);
+	// Data from server
+	let years = $state<string[]>(data.years ?? []);
 	let events = $state<string[]>([]);
 	let availablePhotos = $state<string[]>([]);
-	let addedPhotos = $state<Photo[]>([]);
+	let addedPhotos = $state<Photo[]>(data.photos ?? []);
 
 	// Caption input
 	let captionInput = $state('');
 
-	// Load initial data
-	async function loadData() {
+	// Year selection via form action
+	async function selectYear(year: string) {
+		selectedYear = year;
+		selectedEvent = null;
+		availablePhotos = [];
+		events = [];
 		isLoading = true;
 		try {
-			const [yearsRes, photosRes] = await Promise.all([
-				fetch('/api/photos/available'),
-				getAllPhotos()
-			]);
-
-			if (yearsRes.ok) {
-				years = await yearsRes.json();
+			const formData = new FormData();
+			formData.set('year', year);
+			const result = await fetch(`?/availableEvents`, {
+				method: 'POST',
+				body: formData
+			});
+			const res = await result.json();
+			if (res.success) {
+				events = res.events;
 			}
-
-			addedPhotos = Array.isArray(photosRes) ? photosRes : [];
 		} catch (e) {
-			console.error('Failed to load initial data:', e);
+			console.error('Failed to load events:', e);
 		} finally {
 			isLoading = false;
 		}
 	}
 
-	loadData();
-
-	// Year selection
-	async function selectYear(year: string) {
-		selectedYear = year;
-		selectedEvent = null;
-		availablePhotos = [];
-
-		const res = await fetch(`/api/photos/available/${encodeURIComponent(year)}`);
-		if (res.ok) {
-			events = await res.json();
-		}
-	}
-
-	// Event selection
+	// Event selection via form action
 	async function selectEvent(event: string) {
 		selectedEvent = event;
-
-		const res = await fetch(
-			`/api/photos/available/${encodeURIComponent(selectedYear!)}/${encodeURIComponent(event)}`
-		);
-		if (res.ok) {
-			availablePhotos = await res.json();
+		isLoading = true;
+		try {
+			const formData = new FormData();
+			formData.set('year', selectedYear!);
+			formData.set('event', event);
+			const result = await fetch(`?/availablePhotos`, {
+				method: 'POST',
+				body: formData
+			});
+			const res = await result.json();
+			if (res.success) {
+				availablePhotos = res.photos;
+			}
+		} catch (e) {
+			console.error('Failed to load photos:', e);
+		} finally {
+			isLoading = false;
 		}
 	}
 
@@ -91,7 +92,7 @@
 		addError = null;
 	}
 
-	// Add photo
+	// Add photo via form action
 	async function addPhoto() {
 		if (!selectedPhoto) return;
 
@@ -100,33 +101,33 @@
 		addSuccess = null;
 
 		try {
-			// Calculate sort order: current count + 1
-			const sortOrder = addedPhotos.length + 1;
+			const formData = new FormData();
+			formData.set('filename', `${selectedPhoto.year}/${selectedPhoto.event}/${selectedPhoto.filename}`);
+			formData.set('title', captionInput);
+			formData.set('sortOrder', String(addedPhotos.length + 1));
 
-			const res = await fetch('/api/photos', {
+			const result = await fetch(`?/addPhoto`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					filename: `${selectedPhoto.year}/${selectedPhoto.event}/${selectedPhoto.filename}`,
-					title: captionInput,
-					sortOrder
-				})
+				body: formData
 			});
+			const res = await result.json();
 
-			if (!res.ok) {
-				const body = await res.text();
-				addError = body || `Backend error: ${res.status}`;
-				return;
+			if (res.success) {
+				addSuccess = `Photo added successfully (ID: ${res.id})`;
+				// Refresh added photos list via server action
+				const refreshResult = await fetch(`?/refreshPhotos`, {
+					method: 'POST',
+					body: new FormData()
+				});
+				const refreshData = await refreshResult.json();
+				if (refreshData.success) {
+					addedPhotos = refreshData.photos;
+					years = refreshData.years;
+				}
+				setTimeout(closePopover, 1500);
+			} else {
+				addError = res.message || 'Failed to add photo';
 			}
-
-			const result = await res.json();
-			addSuccess = `Photo added successfully (ID: ${result.id})`;
-
-			// Refresh added photos list
-			addedPhotos = await getAllPhotos();
-
-			// Close popover after a brief delay
-			setTimeout(closePopover, 1500);
 		} catch (e) {
 			addError = e instanceof Error ? e.message : 'Failed to add photo';
 		} finally {

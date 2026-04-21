@@ -2,9 +2,25 @@ import type { Actions, PageServerLoad } from './$types';
 import { getAllPhotos, getURL } from '@nk/shared/server/backend';
 
 export const load: PageServerLoad = async () => {
-    const photos = await getAllPhotos();
+    const apiURL = getURL();
+    const [photosRes, yearsRes] = await Promise.all([
+        fetch(`${apiURL}/api/photos?type=all`),
+        fetch(`${apiURL}/api/photos/available`)
+    ]);
+
+    let photos: any[] = [];
+    if (photosRes.ok) {
+        photos = await photosRes.json();
+    }
+
+    let years: string[] = [];
+    if (yearsRes.ok) {
+        years = await yearsRes.json();
+    }
+
     return {
-        photos
+        photos,
+        years
     };
 };
 
@@ -140,5 +156,16 @@ export const actions: Actions = {
             return { failure: true, message: 'Year, event, and filename required' };
         }
         return { success: true, year, event, filename };
+    },
+
+    refreshPhotos: async () => {
+        const photos = await getAllPhotos();
+        const apiURL = getURL();
+        const yearsRes = await fetch(`${apiURL}/api/photos/available`);
+        let years: string[] = [];
+        if (yearsRes.ok) {
+            years = await yearsRes.json();
+        }
+        return { success: true, photos, years };
     }
 };
