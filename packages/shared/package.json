@@ -2,6 +2,10 @@
 	"name": "@nk/shared",
 	"version": "0.0.1",
 	"type": "module",
+	"peerDependencies": {
+		"clsx": "^2.0.0",
+		"tailwind-merge": "^2.0.0 || ^3.0.0"
+	},
 	"exports": {
 		"./server/backend": "./src/server/backend.ts",
 		"./components/error-card": "./src/components/error-card.svelte",
