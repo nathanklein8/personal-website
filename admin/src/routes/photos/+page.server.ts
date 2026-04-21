@@ -27,7 +27,7 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
     addPhoto: async ({ request }) => {
         const data = await request.formData();
-        
+
         const payload = {
             filename: data.get("filename")?.toString() || '',
             title: data.get("title")?.toString() || '',
@@ -46,7 +46,8 @@ export const actions: Actions = {
             return { failure: true, message: body || `Backend error: ${res.status}` };
         }
         const result = await res.json();
-        return { success: true, id: result.id };
+        const photos = await getAllPhotos();
+        return { success: true, id: result.id, photos };
     },
 
     updatePhoto: async ({ request }) => {
@@ -158,14 +159,5 @@ export const actions: Actions = {
         return { success: true, year, event, filename };
     },
 
-    refreshPhotos: async () => {
-        const photos = await getAllPhotos();
-        const apiURL = getURL();
-        const yearsRes = await fetch(`${apiURL}/api/photos/available`);
-        let years: string[] = [];
-        if (yearsRes.ok) {
-            years = await yearsRes.json();
-        }
-        return { success: true, photos, years };
-    }
+
 };

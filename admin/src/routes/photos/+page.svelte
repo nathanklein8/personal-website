@@ -114,16 +114,7 @@
 
 			if (res.success) {
 				addSuccess = `Photo added successfully (ID: ${res.id})`;
-				// Refresh added photos list via server action
-				const refreshResult = await fetch(`?/refreshPhotos`, {
-					method: 'POST',
-					body: new FormData()
-				});
-				const refreshData = await refreshResult.json();
-				if (refreshData.success) {
-					addedPhotos = refreshData.photos;
-					years = refreshData.years;
-				}
+				addedPhotos = res.photos;
 				setTimeout(closePopover, 1500);
 			} else {
 				addError = res.message || 'Failed to add photo';
