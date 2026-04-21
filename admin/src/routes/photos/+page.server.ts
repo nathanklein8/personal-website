@@ -78,7 +78,7 @@ export const actions: Actions = {
 
     regenerateThumbnails: async () => {
         const apiURL = getURL();
-        const res = await fetch(`${apiURL}/photos/regenerate-thumbnails`, {
+        const res = await fetch(`${apiURL}/api/photos/regenerate-thumbnails`, {
             method: "POST"
         });
 
@@ -91,7 +91,7 @@ export const actions: Actions = {
 
     availableYears: async () => {
         const apiURL = getURL();
-        const res = await fetch(`${apiURL}/photos/available`);
+        const res = await fetch(`${apiURL}/api/photos/available`);
         if (!res.ok) {
             return { failure: true, message: `Failed to load years: ${res.status}` };
         }
@@ -106,7 +106,7 @@ export const actions: Actions = {
         if (!year) {
             return { failure: true, message: 'No year specified' };
         }
-        const res = await fetch(`${apiURL}/photos/available/${encodeURIComponent(year)}`);
+        const res = await fetch(`${apiURL}/api/photos/available/${encodeURIComponent(year)}`);
         if (!res.ok) {
             return { failure: true, message: `Failed to load events: ${res.status}` };
         }
@@ -122,7 +122,7 @@ export const actions: Actions = {
         if (!year || !event) {
             return { failure: true, message: 'Year and event required' };
         }
-        const res = await fetch(`${apiURL}/photos/available/${encodeURIComponent(year)}/${encodeURIComponent(event)}`);
+        const res = await fetch(`${apiURL}/api/photos/available/${encodeURIComponent(year)}/${encodeURIComponent(event)}`);
         if (!res.ok) {
             return { failure: true, message: `Failed to load photos: ${res.status}` };
         }

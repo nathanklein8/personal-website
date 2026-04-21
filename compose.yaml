@@ -18,15 +18,11 @@ services:
     build:
       context: .
       dockerfile: admin/Dockerfile
-      args:
-        # tell non ssl admin ui its origin so it
-        # can do svelte server side actions
-        # different for test/prod
-        PORT: ${ADMIN_PORT}
     restart: unless-stopped
     ports:
       - "${ADMIN_PORT}:3000"
     environment:
+      - ORIGIN=http://atlas:${ADMIN_PORT}
       - API_URL=http://backend:8080
     depends_on:
       - backend
