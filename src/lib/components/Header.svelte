@@ -6,8 +6,8 @@
 		SheetTrigger,
 		SheetHeader,
 		SheetClose
-	} from '$lib/components/ui/sheet';
-	import { buttonVariants } from '$lib/components/ui/button';
+	} from '@nk/shared/components/ui/sheet';
+	import { buttonVariants } from '@nk/shared/components/ui/button';
 	import { Menu } from '@lucide/svelte';
 
 	export let visible = false;

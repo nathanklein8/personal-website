@@ -1,6 +1,6 @@
 <script lang="ts">
 	import PhotoInfo from '$lib/components/photo-info.svelte';
-	import { Card } from '$lib/components/ui/card';
+	import { Card } from '@nk/shared/components/ui/card';
 	let { data } = $props();
 
 	let selectedPhoto = $state<any>(null);

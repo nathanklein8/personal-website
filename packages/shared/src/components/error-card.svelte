@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
+	import { Alert, AlertDescription, AlertTitle } from '@nk/shared/components/ui/alert';
 	import { CloudAlert } from '@lucide/svelte';
 
 	export let title = 'Uh Oh!';

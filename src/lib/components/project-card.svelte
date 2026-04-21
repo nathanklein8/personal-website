@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Card, CardContent, CardFooter, CardTitle } from '$lib/components/ui/card';
-	import { Button } from '$lib/components/ui/button';
-	import { Badge } from '$lib/components/ui/badge';
+	import { Card, CardContent, CardFooter, CardTitle } from '@nk/shared/components/ui/card';
+	import { Button } from '@nk/shared/components/ui/button';
+	import { Badge } from '@nk/shared/components/ui/badge';
 	import { Puzzle, Globe } from '@lucide/svelte';
 
 	const iconMap = {

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "$lib/components/ui/dialog";
-	import { Separator } from "$lib/components/ui/separator";
-	import { ScrollArea } from "$lib/components/ui/scroll-area";
+	import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@nk/shared/components/ui/dialog";
+	import { Separator } from "@nk/shared/components/ui/separator";
+	import { ScrollArea } from "@nk/shared/components/ui/scroll-area";
 	import { X } from "@lucide/svelte";
-	import { Button } from "$lib/components/ui/button";
+	import { Button } from "@nk/shared/components/ui/button";
 
 	export let open = false;
 	export let onOpenChange: (value: boolean) => void = () => {};

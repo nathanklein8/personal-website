@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { buttonVariants } from '$lib/components/ui/button';
-	import { Card, CardContent } from '$lib/components/ui/card';
+	import { buttonVariants } from '@nk/shared/components/ui/button';
+	import { Card, CardContent } from '@nk/shared/components/ui/card';
 	import ErrorCard from '@nk/shared/components/error-card';
 	import type { PageProps } from './$types';
 	import { Check, X } from '@lucide/svelte';

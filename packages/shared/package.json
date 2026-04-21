@@ -5,6 +5,18 @@
 	"exports": {
 		"./server/backend": "./src/server/backend.ts",
 		"./components/error-card": "./src/components/error-card.svelte",
-		"./components/mode-toggle": "./src/components/mode-toggle.svelte"
+		"./components/mode-toggle": "./src/components/mode-toggle.svelte",
+		"./components/ui/alert": "./src/components/ui/alert/index.ts",
+		"./components/ui/badge": "./src/components/ui/badge/index.ts",
+		"./components/ui/dialog": "./src/components/ui/dialog/index.ts",
+		"./components/ui/button": "./src/components/ui/button/index.ts",
+		"./components/ui/card": "./src/components/ui/card/index.ts",
+		"./components/ui/carousel": "./src/components/ui/carousel/index.ts",
+		"./components/ui/dropdown-menu": "./src/components/ui/dropdown-menu/index.ts",
+		"./components/ui/scroll-area": "./src/components/ui/scroll-area/index.ts",
+		"./components/ui/separator": "./src/components/ui/separator/index.ts",
+		"./components/ui/sheet": "./src/components/ui/sheet/index.ts",
+		"./components/ui/tooltip": "./src/components/ui/tooltip/index.ts",
+		"./utils": "./src/utils.ts"
 	}
 }
