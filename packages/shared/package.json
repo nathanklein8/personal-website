@@ -3,8 +3,11 @@
 	"version": "0.0.1",
 	"type": "module",
 	"peerDependencies": {
+		"@lucide/svelte": "^0.544.0 || ^1.0.0",
+		"bits-ui": "^2.0.0",
 		"clsx": "^2.0.0",
-		"tailwind-merge": "^2.0.0 || ^3.0.0"
+		"tailwind-merge": "^2.0.0 || ^3.0.0",
+		"tailwind-variants": "^1.0.0 || ^2.0.0 || ^3.0.0"
 	},
 	"exports": {
 		"./server/backend": "./src/server/backend.ts",
