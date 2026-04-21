@@ -44,7 +44,7 @@
 		}
 	}
 
-	await loadData();
+	loadData();
 
 	// Year selection
 	async function selectYear(year: string) {
@@ -163,11 +163,6 @@
 		const base = parts[parts.length - 1];
 		return base.replace(/\.[^/.]+$/, '');
 	}
-
-	// Get photo sort order for the next photo
-	function getNextSortOrder(): number {
-		return addedPhotos.length + 1;
-	}
 </script>
 
 <svelte:head>
@@ -179,11 +174,11 @@
 	<div class="flex items-center justify-between w-full">
 		<h1 class="text-2xl font-bold">Photo Manager</h1>
 		<button
-			class="btn btn-primary"
+			type="button"
+			class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
 			onclick={() => {
 				showBrowser = !showBrowser;
 				if (!showBrowser) {
-					// Reset browser state when closing
 					selectedYear = null;
 					selectedEvent = null;
 					availablePhotos = [];
@@ -202,6 +197,7 @@
 			{#if selectedYear || selectedEvent}
 				<nav class="flex items-center gap-2 text-sm text-muted-foreground">
 					<button
+						type="button"
 						class="hover:text-foreground transition-colors"
 						onclick={goBackToYears}
 					>
@@ -210,6 +206,7 @@
 					{#if selectedEvent}
 						<span>/</span>
 						<button
+							type="button"
 							class="hover:text-foreground transition-colors"
 							onclick={goBackToEvents}
 						>
@@ -236,7 +233,8 @@
 				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 					{#each years.sort((a, b) => b - a) as year}
 						<button
-							class="card card-bordered p-4 text-center hover:shadow-md transition-all cursor-pointer"
+							type="button"
+							class="rounded-lg border bg-card text-card-foreground shadow-sm border-border p-4 text-center hover:shadow-md transition-all cursor-pointer"
 							onclick={() => selectYear(year)}
 						>
 							<span class="text-lg font-semibold">{year}</span>
@@ -249,7 +247,8 @@
 				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
 					{#each events as event}
 						<button
-							class="card card-bordered p-4 text-left hover:shadow-md transition-all cursor-pointer"
+							type="button"
+							class="rounded-lg border bg-card text-card-foreground shadow-sm border-border p-4 text-left hover:shadow-md transition-all cursor-pointer"
 							onclick={() => selectEvent(event)}
 						>
 							<span class="font-medium">{getEventDisplay(event)}</span>
@@ -262,6 +261,7 @@
 				<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
 					{#each availablePhotos as filename}
 						<button
+							type="button"
 							class="group relative aspect-square rounded-lg overflow-hidden border border-border hover:border-primary transition-all cursor-pointer"
 							onclick={() => selectPhoto(filename)}
 						>
@@ -291,7 +291,11 @@
 
 	<!-- Photo Popover (Dialog) -->
 	{#if selectedPhoto}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onclick={closePopover}>
+		<div
+			role="dialog"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+			onclick={closePopover}
+		>
 			<div
 				class="bg-background border border-border rounded-lg shadow-lg p-6 w-full max-w-md mx-4 space-y-4"
 				onclick={(e) => e.stopPropagation()}
@@ -312,7 +316,7 @@
 						id="caption"
 						type="text"
 						bind:value={captionInput}
-						class="input input-bordered w-full"
+						class="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 						placeholder="Enter caption..."
 						onkeydown={(e) => {
 							if (e.key === 'Enter') addPhoto();
@@ -331,19 +335,21 @@
 				<!-- Actions -->
 				<div class="flex justify-end gap-2 pt-2">
 					<button
-						class="btn btn-outline"
+						type="button"
+						class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground"
 						onclick={closePopover}
 						disabled={addLoading}
 					>
 						Close
 					</button>
 					<button
-						class="btn btn-primary"
+						type="button"
+						class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
 						onclick={addPhoto}
 						disabled={addLoading || !captionInput.trim()}
 					>
 						{#if addLoading}
-							<span class="loading loading-spinner loading-sm"></span>
+							<span class="inline-block h-4 w-4 animate-spin border-2 border-current border-t-transparent rounded-full"></span>
 							Adding...
 						{:else}
 							Add Photo
@@ -360,13 +366,13 @@
 			<h2 class="text-xl font-bold">Added Photos</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 				{#each addedPhotos as photo}
-					<div class="card card-bordered">
-						<div class="card-body p-3">
+					<div class="rounded-lg border bg-card text-card-foreground shadow-sm border-border">
+						<div class="p-3">
 							{#if photo.thumbnailPath}
 								<img
 									src={`/api/photos/available/${photo.sourcePath}/preview`}
 									alt={photo.title}
-									class="w-full h-32 object-cover rounded-md mb-2"
+									class="w-full h-32 object-cover rounded-lg mb-2"
 								/>
 							{/if}
 							<h3 class="text-sm font-medium truncate">{photo.title}</h3>
@@ -375,13 +381,13 @@
 							{/if}
 							<div class="flex gap-1 mt-1 flex-wrap">
 								{#if photo.aperture}
-									<span class="badge badge-sm badge-outline">f/{photo.aperture}</span>
+									<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">f/{photo.aperture}</span>
 								{/if}
 								{#if photo.shutterSpeed}
-									<span class="badge badge-sm badge-outline">{photo.shutterSpeed}</span>
+									<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">{photo.shutterSpeed}</span>
 								{/if}
 								{#if photo.iso}
-									<span class="badge badge-sm badge-outline">ISO {photo.iso}</span>
+									<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">ISO {photo.iso}</span>
 								{/if}
 							</div>
 						</div>
@@ -391,58 +397,3 @@
 		</div>
 	{/if}
 </section>
-
-<style>
-	.btn {
-		@apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
-		@apply h-10 px-4 py-2;
-	}
-
-	.btn-primary {
-		@apply bg-primary text-primary-foreground hover:bg-primary/90;
-	}
-
-	.btn-outline {
-		@apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
-	}
-
-	.card {
-		@apply rounded-lg border bg-card text-card-foreground shadow-sm;
-	}
-
-	.card-bordered {
-		@apply border border-border;
-	}
-
-	.card-body {
-		@apply p-6;
-	}
-
-	.input {
-		@apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
-	}
-
-	.input-bordered {
-		@apply border border-border;
-	}
-
-	.badge {
-		@apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
-	}
-
-	.badge-outline {
-		@apply border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80;
-	}
-
-	.loading {
-		@apply animate-spin;
-	}
-
-	.loading-spinner {
-		width: 16px;
-		height: 16px;
-		border: 2px solid currentColor;
-		border-top-color: transparent;
-		border-radius: 50%;
-	}
-</style>
