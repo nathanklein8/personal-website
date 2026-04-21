@@ -21,6 +21,9 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+# Plans
+PLAN.md
+
 # photo library for dev testing
 photos/*
 photos
