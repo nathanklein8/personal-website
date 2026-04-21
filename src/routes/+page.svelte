@@ -89,7 +89,7 @@
 				target="_blank"
 				rel="noopener noreferrer"
 			>
-				Github
+				GitHub
 				<ArrowUpRight class="h-4 w-4" />
 			</a>
 		</span>

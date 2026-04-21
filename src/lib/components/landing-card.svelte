@@ -66,7 +66,7 @@
 						<ArrowUpRight size={20} />
 					</p>
 					<p class="flex max-w-fit items-center gap-0.5 underline-offset-4 hover:underline">
-						<a href={github} target="_blank" rel="noopener noreferrer"> Github </a>
+						<a href={github} target="_blank" rel="noopener noreferrer"> GitHub </a>
 						<ArrowUpRight size={20} />
 					</p>
 				</div>
