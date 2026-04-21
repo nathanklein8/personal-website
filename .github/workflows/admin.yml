@@ -41,7 +41,7 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:latest
 
       - name: Save image
-        run: docker save -o /tmp/pwsite-images/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
+        run: mkdir /tmp/pwsite-images && docker save -o /tmp/pwsite-images/${{ env.IMAGE_NAME }}.tar ${{ env.IMAGE_NAME }}:latest
 
   deploy-admin-container:
     runs-on: self-hosted
