@@ -1,7 +1,5 @@
 <script lang="ts">
 	import ModeToggle from '@nk/shared/components/mode-toggle';
-	import { buttonVariants } from '@nk/shared/components/ui/button';
-	import { Menu } from '@lucide/svelte';
 
 	export let visible = false;
 </script>

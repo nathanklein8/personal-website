@@ -37,10 +37,9 @@ A personal portfolio website built with SvelteKit (frontend) and Go (backend), d
 .
 ├── admin/                 # Admin panel (SvelteKit)
 │   ├── src/
-│   │   ├── routes/       # Admin pages (landing, projects, photos)
+│   │   ├── routes/       # Admin pages (landing, photos)
 │   │   ├── lib/
 │   │   │   ├── components/
-│   │   │   ├── server/
 │   │   │   └── utils.ts
 │   └── vite.config.ts
 ├── backend/              # Go API server
@@ -81,8 +80,8 @@ A personal portfolio website built with SvelteKit (frontend) and Go (backend), d
 │   ├── routes/         # Public pages (landing, projects, photography)
 │   ├── lib/
 │   │   ├── components/ # App-specific components
-│   │   ├── server/     # Backend client
 │   │   └── utils.ts
+│   # Backend client: @nk/shared/server/backend
 ├── compose.yaml         # Docker Compose configuration
 └── .env.example         # Environment template
 ```
@@ -136,6 +135,7 @@ PHOTO_LIBRARY=/photos     # Local path mounted to /photos in container (read-onl
 - shutter_speed (text, nullable) - extracted from EXIF, format "1/Xs" or "Xs"
 - iso (text, nullable) - extracted from EXIF
 - visible (boolean, default true)
+- featured (boolean, default false)
 - sort_order (integer, default 0)
 - source_path (text, not null) - full relative path in photo library, e.g. "2026/1:15 Cobb Hill Park/IMGP5178.jpg"
 - thumbnail_path (text, nullable) - relative path in thumbnails volume, e.g. "2026/1:15 Cobb Hill Park/IMGP5178.jpg_thumb.jpg"
@@ -225,10 +225,12 @@ The preview endpoint (GET /available/{year}/{event}/{filename}/preview) auto-gen
 <shared-components>
 - packages/shared/src/components/error-card.svelte - Error display
 - packages/shared/src/components/mode-toggle.svelte - Theme toggle
+- packages/shared/src/components/ui/ - Shadcn/ui components (shared between apps)
 - src/lib/components/landing-card.svelte - Bio/social display
 - src/lib/components/project-card.svelte - Project showcase
 - src/lib/components/photo-info.svelte - Photo details dialog
-- src/lib/components/Header.svelte - Navigation (both apps)
+- src/lib/components/Header.svelte - Navigation (main app)
+- admin/src/lib/components/Header.svelte - Navigation (admin panel)
 </shared-components>
 
 <ui-components>packages/shared/src/components/ui/
@@ -279,6 +281,8 @@ Used by service layer for validation errors; controllers check for this type and
 <development-commands>
 ```bash
 # Start dev servers
+start dev servers with tmux, the command is blocking.
+check if the server is already running in tmux first.
 bun run dev              # Frontend + backend (via Docker)
 
 # Database operations
@@ -371,6 +375,13 @@ docker compose exec db psql -U user -d devdb
 ```
 </database-access>
 </testing-and-debugging>
+
+<debugging-tips>
+- `@nk/shared` alias: Configured via `kit.alias` in `svelte.config.js` (both main app and admin). Do NOT add it to `tsconfig.json` paths — SvelteKit warns against this and it breaks `$lib` resolution. The IDE picks up the alias from `kit.alias` via auto-generated tsconfig.
+- Svelte 5 reactivity: When deriving a value from a prop, use `$derived` — `const` only captures the initial value and won't update if the prop changes. E.g. `const IconComponent = iconMap[icon]` is wrong; use `const IconComponent = $derived(iconMap[icon])`.
+- Backend types don't auto-generate to TypeScript: The Go models (e.g. `backend/models/photo.go`) are the source of truth. Frontend types must be manually defined and kept in sync.
+- DB schema vs API model: The database uses snake_case (`file_path`), but the Go JSON tags use camelCase (`filePath`). Auto-generating types from the DB schema will give the wrong shape.
+</debugging-tips>
 
 <notes>
 - Photo library: Local photos/ directory mounted read-only to /photos in the backend container. Structured as year/event/filename.jpg.

@@ -1,4 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
+import type { Photo } from '@nk/shared/types/photo';
 import { getAllPhotos, getURL } from '@nk/shared/server/backend';
 
 export const load: PageServerLoad = async () => {
@@ -8,7 +9,7 @@ export const load: PageServerLoad = async () => {
         fetch(`${apiURL}/api/photos/available`)
     ]);
 
-    let photos: any[] = [];
+    let photos: Photo[] = [];
     if (photosRes.ok) {
         photos = await photosRes.json();
     }

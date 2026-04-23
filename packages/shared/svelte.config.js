@@ -8,6 +8,7 @@ const config = {
 			'@nk/shared/*': './src/*',
 		},
 	},
+	extensions: ['.svelte'],
 };
 
 export default config;

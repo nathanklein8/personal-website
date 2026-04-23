@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { ActionData, PageData } from './$types';
+	import type { PageProps } from './$types';
+	import type { Photo } from '@nk/shared/types/photo';
 
-	let { data, form }: PageData & { form: ActionData } = $props();
+	let { data, form }: PageProps = $props();
 
 	// State management
 	let showBrowser = $state(false);
@@ -15,13 +15,18 @@
 	let addError = $state<string | null>(null);
 
 	// Data from server
-	let years = $state<string[]>(data.years ?? []);
+	let years = $state<string[]>([]);
 	let events = $state<string[]>([]);
 	let availablePhotos = $state<string[]>([]);
-	let addedPhotos = $state<Photo[]>(data.photos ?? []);
+	let addedPhotos = $state<Photo[]>([]);
 
 	// Caption input
 	let captionInput = $state('');
+
+	$effect(() => {
+		years = data.years ?? [];
+		addedPhotos = data.photos ?? [] as Photo[];
+	});
 
 	// Year selection via form action
 	async function selectYear(year: string) {
@@ -157,13 +162,17 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Photo Editor - Personal Website</title>
-</svelte:head>
-
-<section class="flex flex-col items-center gap-6 py-8 px-4 max-w-6xl mx-auto">
+<section
+	id="photos"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
+>
 	<!-- Header -->
-	<div class="flex items-center justify-between w-full">
+
+	<div class="font-3xl bg-red-500">
+		test 1
+	</div>
+
+	<div class="flex flex-row items-center justify-between w-full bg-red-400">
 		<h1 class="text-2xl font-bold">Photo Manager</h1>
 		<button
 			type="button"
@@ -223,7 +232,7 @@
 			<!-- Year List -->
 			{#if !selectedYear && years.length > 0}
 				<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-					{#each years.sort((a, b) => b - a) as year}
+					{#each years as year}
 						<button
 							type="button"
 							class="rounded-lg border bg-card text-card-foreground shadow-sm border-border p-4 text-center hover:shadow-md transition-all cursor-pointer"
@@ -282,7 +291,7 @@
 	{/if}
 
 	<!-- Photo Popover (Dialog) -->
-	{#if selectedPhoto}
+	<!-- {#if selectedPhoto}
 		<div
 			role="dialog"
 			class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -292,7 +301,6 @@
 				class="bg-background border border-border rounded-lg shadow-lg p-6 w-full max-w-md mx-4 space-y-4"
 				onclick={(e) => e.stopPropagation()}
 			>
-				<!-- Preview Image -->
 				<div class="relative aspect-video rounded-lg overflow-hidden bg-muted">
 					<img
 						src={getPreviewUrl(selectedPhoto.year, selectedPhoto.event, selectedPhoto.filename)}
@@ -301,7 +309,6 @@
 					/>
 				</div>
 
-				<!-- Caption Input -->
 				<div class="space-y-2">
 					<label for="caption" class="text-sm font-medium">Caption</label>
 					<input
@@ -316,7 +323,6 @@
 					/>
 				</div>
 
-				<!-- Status Messages -->
 				{#if addSuccess}
 					<p class="text-sm text-green-600 dark:text-green-400">{addSuccess}</p>
 				{/if}
@@ -324,7 +330,6 @@
 					<p class="text-sm text-red-600 dark:text-red-400">{addError}</p>
 				{/if}
 
-				<!-- Actions -->
 				<div class="flex justify-end gap-2 pt-2">
 					<button
 						type="button"
@@ -350,7 +355,7 @@
 				</div>
 			</div>
 		</div>
-	{/if}
+	{/if} -->
 
 	<!-- Added Photos List -->
 	{#if addedPhotos.length > 0}
@@ -362,7 +367,7 @@
 						<div class="p-3">
 							{#if photo.thumbnailPath}
 								<img
-									src={`/api/photos/available/${photo.sourcePath}/preview`}
+									src="/me.jpg"
 									alt={photo.title}
 									class="w-full h-32 object-cover rounded-lg mb-2"
 								/>
@@ -388,4 +393,8 @@
 			</div>
 		</div>
 	{/if}
+
+	<div class="bg-yellow-400 text-3xl">
+		test 2
+	</div>
 </section>

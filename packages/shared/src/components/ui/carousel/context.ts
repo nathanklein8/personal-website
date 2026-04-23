@@ -1,4 +1,4 @@
-import type { WithElementRef } from "$lib/utils.js";
+import type { WithElementRef } from "@nk/shared/utils";
 import type {
 	EmblaCarouselSvelteType,
 	default as emblaCarouselSvelte,
