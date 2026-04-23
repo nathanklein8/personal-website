@@ -1,21 +1,18 @@
 <script lang="ts">
  import { SunIcon, MoonIcon } from "@lucide/svelte";
  
- import { resetMode, setMode } from "mode-watcher";
+ import { resetMode, setMode, mode } from "mode-watcher";
  import * as DropdownMenu from "@nk/shared/components/ui/dropdown-menu";
  import { buttonVariants } from "@nk/shared/components/ui/button";
+
+ const Icon = $derived(mode === "dark" ? MoonIcon : SunIcon);
 </script>
- 
+
 <DropdownMenu.Root>
  <DropdownMenu.Trigger
   class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
  >
-  <SunIcon
-   class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 !transition-all dark:-rotate-90 dark:scale-0"
-  />
-  <MoonIcon
-   class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 !transition-all dark:rotate-0 dark:scale-100"
-  />
+  {@render Icon({ class: "h-[1.2rem] w-[1.2rem] !transition-all" })}
   <span class="sr-only">Toggle theme</span>
  </DropdownMenu.Trigger>
  <DropdownMenu.Content align="end">
