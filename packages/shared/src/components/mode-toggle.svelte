@@ -5,7 +5,7 @@
  import * as DropdownMenu from "@nk/shared/components/ui/dropdown-menu";
  import { buttonVariants } from "@nk/shared/components/ui/button";
 
- const Icon = $derived(mode === "dark" ? MoonIcon : SunIcon);
+ const Icon = $derived($mode === "dark" ? MoonIcon : SunIcon);
 </script>
 
 <DropdownMenu.Root>
