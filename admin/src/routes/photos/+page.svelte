@@ -37,13 +37,13 @@
 	async function selectYear(year: string) {
 		selectedYear = year;
 		selectedEvent = null;
-		await goto(`/?year=${encodeURIComponent(year)}`);
+		await goto(`/photos/?year=${encodeURIComponent(year)}`);
 	}
 
 	// Event selection - navigate with query params to trigger server-side load
 	async function selectEvent(event: string) {
 		selectedEvent = event;
-		await goto(`/?year=${encodeURIComponent(selectedYear!)}&event=${encodeURIComponent(event)}`);
+		await goto(`/photos/?year=${encodeURIComponent(selectedYear!)}&event=${encodeURIComponent(event)}`);
 	}
 
 	// Photo selection (opens popover)
@@ -105,12 +105,12 @@
 	function goBackToYears() {
 		selectedYear = null;
 		selectedEvent = null;
-		goto('/');
+		goto('/photos');
 	}
 
 	function goBackToEvents() {
 		selectedEvent = null;
-		goto(`/?year=${encodeURIComponent(selectedYear!)}`);
+		goto(`/photos/?year=${encodeURIComponent(selectedYear!)}`);
 	}
 
 	// Get preview URL for a photo
