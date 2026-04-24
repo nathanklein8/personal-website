@@ -95,40 +95,39 @@ func (c *PhotoController) ListPhotos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(photos)
 }
 
-// GET /api/photos/available/{year}/{event}/{filename}/preview - Serve thumbnail or medium preview
+// GET /api/photos/available/{year}/{event}/{filename}/preview - Serve thumbnail, medium, or full preview
+// Query param: size=thumb|med|full (default: med)
 func (c *PhotoController) ServePreview(w http.ResponseWriter, r *http.Request) {
 	year := chi.URLParam(r, "year")
 	event := chi.URLParam(r, "event")
 	filename := chi.URLParam(r, "filename")
 
-	// Determine the base filename and requested size
-	var base, servePath string
-	if filepath.Ext(filename) == "_thumb.jpg" {
-		base = filename[:len(filename)-len("_thumb.jpg")] + ".jpg"
-		servePath = filepath.Join("/thumbnails", year, event, base+"_thumb.jpg")
-	} else if filepath.Ext(filename) == "_med.jpg" {
-		base = filename[:len(filename)-len("_med.jpg")] + ".jpg"
-		servePath = filepath.Join("/thumbnails", year, event, base+"_med.jpg")
-	} else {
-		base = filename
-		servePath = filepath.Join("/thumbnails", year, event, base+"_med.jpg")
+	size := r.URL.Query().Get("size")
+	if size == "" {
+		size = "med"
 	}
 
-	// Check if preview file exists, generate if not
+	// Build the relative source path
+	sourceRelPath := filepath.Join(year, event, filename)
+	thumbRelPath := filepath.Join(year, event, filename+"_thumb.jpg")
+	mediumRelPath := filepath.Join(year, event, filename+"_med.jpg")
+
+	var servePath string
+	switch size {
+	case "thumb":
+		servePath = filepath.Join("/thumbnails", thumbRelPath)
+	case "med":
+		servePath = filepath.Join("/thumbnails", mediumRelPath)
+	case "full":
+		servePath = filepath.Join("/photos", sourceRelPath)
+	default:
+		http.Error(w, "invalid size parameter", http.StatusBadRequest)
+		return
+	}
+
 	if _, err := os.Stat(servePath); os.IsNotExist(err) {
-		sourceAbsPath := filepath.Join("/photos", year, event, base)
-		thumbAbsPath := filepath.Join("/thumbnails", year, event, base+"_thumb.jpg")
-		mediumAbsPath := filepath.Join("/thumbnails", year, event, base+"_med.jpg")
-
-		if _, err := os.Stat(sourceAbsPath); os.IsNotExist(err) {
-			http.Error(w, "source image not found", http.StatusNotFound)
-			return
-		}
-
-		if err := c.service.GenerateThumbnails(sourceAbsPath, thumbAbsPath, mediumAbsPath); err != nil {
-			http.Error(w, "failed to generate preview", http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, "preview not found", http.StatusNotFound)
+		return
 	}
 
 	http.ServeFile(w, r, servePath)
@@ -154,12 +153,7 @@ func (c *PhotoController) ServeThumbnail(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if p.MediumPath == nil {
-		http.Error(w, "no thumbnail available", http.StatusNotFound)
-		return
-	}
-
-	servePath := filepath.Join("/thumbnails", *p.MediumPath)
+	servePath := filepath.Join("/thumbnails", p.MediumPath())
 	if _, err := os.Stat(servePath); os.IsNotExist(err) {
 		http.Error(w, "thumbnail not found", http.StatusNotFound)
 		return

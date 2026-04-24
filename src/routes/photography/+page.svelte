@@ -28,7 +28,7 @@
 				>
 					<div class="aspect-square overflow-hidden bg-muted">
 						<img 
-							src={`/api/photos/${photo.year}/${photo.event}/${photo.filename}/image`} 
+							src={photo.thumbURL} 
 							alt={photo.altText || photo.title}
 							class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
 							loading="lazy"
@@ -49,7 +49,7 @@
 		}} 
 		photo={{
 			...selectedPhoto,
-			src: selectedPhoto ? `/api/photos/${selectedPhoto.year}/${selectedPhoto.event}/${selectedPhoto.filename}/image` : '',
+			src: selectedPhoto?.previewURL ?? '',
 			alt: selectedPhoto?.altText,
 			date: selectedPhoto?.dateTaken,
 			shutter: selectedPhoto?.shutterSpeed

@@ -119,7 +119,7 @@
 
 			if (res.success) {
 				addSuccess = `Photo added successfully (ID: ${res.id})`;
-				addedPhotos = res.photos;
+				addedPhotos = [res.photo, ...addedPhotos];
 				setTimeout(closePopover, 1500);
 			} else {
 				addError = res.message || 'Failed to add photo';
@@ -167,10 +167,6 @@
 	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-linear-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
 >
 	<!-- Header -->
-
-	<div class="font-3xl bg-red-500">
-		test 1
-	</div>
 
 	<div class="flex flex-row items-center justify-between w-full bg-red-400">
 		<h1 class="text-2xl font-bold">Photo Manager</h1>
@@ -370,9 +366,9 @@
 				{#each addedPhotos as photo}
 					<div class="rounded-lg border bg-card text-card-foreground shadow-sm border-border">
 						<div class="p-3">
-							{#if photo.thumbnailPath}
+							{#if photo.thumbURL}
 								<img
-									src="/me.jpg"
+									src={photo.thumbURL}
 									alt={photo.title}
 									class="w-full h-32 object-cover rounded-lg mb-2"
 								/>
@@ -398,8 +394,4 @@
 			</div>
 		</div>
 	{/if}
-
-	<div class="bg-yellow-400 text-3xl">
-		test 2
-	</div>
 </section>

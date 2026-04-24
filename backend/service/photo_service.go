@@ -181,7 +181,7 @@ func (s *PhotoService) GetAll(ctx context.Context) ([]models.Photo, error) {
 		return nil, err
 	}
 	for i := range photos {
-		s.populatePathFields(&photos[i])
+		photos[i].SetPreviewURLs()
 	}
 	return photos, nil
 }
@@ -192,7 +192,7 @@ func (s *PhotoService) GetVisible(ctx context.Context) ([]models.Photo, error) {
 		return nil, err
 	}
 	for i := range photos {
-		s.populatePathFields(&photos[i])
+		photos[i].SetPreviewURLs()
 	}
 	return photos, nil
 }
@@ -203,18 +203,9 @@ func (s *PhotoService) GetFeatured(ctx context.Context) ([]models.Photo, error) 
 		return nil, err
 	}
 	for i := range photos {
-		s.populatePathFields(&photos[i])
+		photos[i].SetPreviewURLs()
 	}
 	return photos, nil
-}
-
-func (s *PhotoService) populatePathFields(photo *models.Photo) {
-	parts := strings.Split(photo.SourcePath, "/")
-	if len(parts) == 3 {
-		photo.Year = parts[0]
-		photo.Event = parts[1]
-		photo.Filename = parts[2]
-	}
 }
 
 func (s *PhotoService) GetByID(ctx context.Context, id int) (*models.Photo, error) {
@@ -222,7 +213,7 @@ func (s *PhotoService) GetByID(ctx context.Context, id int) (*models.Photo, erro
 	if err != nil {
 		return nil, err
 	}
-	s.populatePathFields(photo)
+	photo.SetPreviewURLs()
 	return photo, nil
 }
 
@@ -261,13 +252,11 @@ func (s *PhotoService) AddPhoto(ctx context.Context, req models.AddPhotoRequest)
 
 	// Build photo model
 	photo := &models.Photo{
-		Title:         req.Title,
-		FilePath:      filename,
-		SourcePath:    req.Filename,
-		ThumbnailPath: strPtr(thumbRelPath),
-		MediumPath:    strPtr(mediumRelPath),
-		SortOrder:     req.SortOrder,
-		Visible:       true,
+		Title:        req.Title,
+		FilePath:     filename,
+		SourcePath:   req.Filename,
+		SortOrder:    req.SortOrder,
+		Visible:      true,
 		// Copy EXIF data
 		Camera:       exifPhoto.Camera,
 		Lens:         exifPhoto.Lens,
@@ -282,6 +271,7 @@ func (s *PhotoService) AddPhoto(ctx context.Context, req models.AddPhotoRequest)
 		return nil, fmt.Errorf("failed to save photo record: %w", err)
 	}
 
+	photo.SetPreviewURLs()
 	return photo, nil
 }
 
@@ -315,14 +305,10 @@ func (s *PhotoService) DeleteByID(ctx context.Context, id int) error {
 	}
 
 	// Delete generated thumbnails from thumbnails volume
-	if photo.ThumbnailPath != nil {
-		thumbPath := filepath.Join(thumbnailPath, *photo.ThumbnailPath)
-		os.Remove(thumbPath)
-	}
-	if photo.MediumPath != nil {
-		medPath := filepath.Join(thumbnailPath, *photo.MediumPath)
-		os.Remove(medPath)
-	}
+	thumbPath := filepath.Join(thumbnailPath, photo.ThumbnailPath())
+	medPath := filepath.Join(thumbnailPath, photo.MediumPath())
+	os.Remove(thumbPath)
+	os.Remove(medPath)
 
 	// Delete DB row
 	return s.repo.DeleteByID(ctx, id)
@@ -335,17 +321,9 @@ func (s *PhotoService) RegenerateAllThumbnails(ctx context.Context) error {
 	}
 
 	for _, photo := range photos {
-		parts := strings.Split(photo.SourcePath, "/")
-		if len(parts) != 3 {
-			continue
-		}
-		year, event, filename := parts[0], parts[1], parts[2]
-
-		sourceAbsPath := filepath.Join(photoLibraryPath, year, event, filename)
-		thumbRelPath := filepath.Join(year, event, filename+"_thumb.jpg")
-		mediumRelPath := filepath.Join(year, event, filename+"_med.jpg")
-		thumbAbsPath := filepath.Join(thumbnailPath, thumbRelPath)
-		mediumAbsPath := filepath.Join(thumbnailPath, mediumRelPath)
+		sourceAbsPath := filepath.Join(photoLibraryPath, photo.SourcePath)
+		thumbAbsPath := filepath.Join(thumbnailPath, photo.ThumbnailPath())
+		mediumAbsPath := filepath.Join(thumbnailPath, photo.MediumPath())
 
 		// Ensure thumbnail directory exists
 		thumbDir := filepath.Dir(thumbAbsPath)
@@ -355,11 +333,6 @@ func (s *PhotoService) RegenerateAllThumbnails(ctx context.Context) error {
 
 		// Generate thumbnails
 		if err := s.GenerateThumbnails(sourceAbsPath, thumbAbsPath, mediumAbsPath); err != nil {
-			continue
-		}
-
-		// Update DB with new paths
-		if err := s.repo.UpdateThumbnailPaths(ctx, photo.ID, strPtr(thumbRelPath), strPtr(mediumRelPath)); err != nil {
 			continue
 		}
 	}

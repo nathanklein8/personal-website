@@ -149,8 +149,7 @@ export async function addPhoto(filename: string, title: string, sortOrder: numbe
   }
 
   const result = await res.json();
-  const photos = await getAllPhotos();
-  return { success: true, id: result.id, photos };
+  return { success: true, id: result.id, photo: result };
 }
 
 export async function updatePhoto(id: string | number, title: string, sortOrder: number, visible: boolean) {

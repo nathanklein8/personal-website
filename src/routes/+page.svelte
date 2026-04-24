@@ -106,11 +106,11 @@
 		{#if data.featuredPhotos && data.featuredPhotos.length > 0}
 			<Carousel class="max-w-[min(600px,80vw)]" opts={{ loop: true }}>
 				<CarouselContent class="">
-					{#each data.featuredPhotos as photo, index}
+					{#each data.featuredPhotos as photo}
 						<CarouselItem class="basis-auto">
 							<div class="w-full bg-muted flex items-center justify-center overflow-hidden">
 								<img
-									src={`/me.jpg`}
+									src={photo.previewURL}
 									alt={photo.altText || photo.title}
 									class="aspect-square object-cover w-full max-w-lg"
 								/>

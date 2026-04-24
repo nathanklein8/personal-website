@@ -14,9 +14,6 @@ export interface Photo {
   featured: boolean;
   sortOrder: number;
   sourcePath: string;
-  thumbnailPath?: string | null;
-  mediumPath?: string | null;
-  year: string;
-  event: string;
-  filename: string;
+  previewURL: string;
+  thumbURL: string;
 }

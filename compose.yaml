@@ -24,8 +24,8 @@ services:
     ports:
       - "${ADMIN_PORT}:3000"
     environment:
-      - ORIGIN=http://localhost:${ADMIN_PORT}
-      - API_URL=http://backend:8080
+      - ORIGIN=http://localhost:${ADMIN_PORT} # change this back to atlas, or make it dynamic somehow
+      - API_URL=${API_URL}
     volumes:
       - photos-thumbnails:/thumbnails:ro
     depends_on:
