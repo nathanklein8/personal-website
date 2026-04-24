@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import type { Photo } from '@nk/shared/types/photo';
+	import { goto } from '$app/navigation';
+	import { Button } from '@nk/shared/components/ui/button';
+	import { ScrollArea } from '@nk/shared/components/ui/scroll-area';
 
 	let { data, form }: PageProps = $props();
 
@@ -26,54 +29,21 @@
 	$effect(() => {
 		years = data.years ?? [];
 		addedPhotos = data.photos ?? [] as Photo[];
+		events = data.events ?? [];
+		availablePhotos = data.availablePhotos ?? [];
 	});
 
-	// Year selection via form action
+	// Year selection - navigate with query param to trigger server-side load
 	async function selectYear(year: string) {
 		selectedYear = year;
 		selectedEvent = null;
-		availablePhotos = [];
-		events = [];
-		isLoading = true;
-		try {
-			const formData = new FormData();
-			formData.set('year', year);
-			const result = await fetch(`?/availableEvents`, {
-				method: 'POST',
-				body: formData
-			});
-			const res = await result.json();
-			if (res.success) {
-				events = res.events;
-			}
-		} catch (e) {
-			console.error('Failed to load events:', e);
-		} finally {
-			isLoading = false;
-		}
+		await goto(`/?year=${encodeURIComponent(year)}`);
 	}
 
-	// Event selection via form action
+	// Event selection - navigate with query params to trigger server-side load
 	async function selectEvent(event: string) {
 		selectedEvent = event;
-		isLoading = true;
-		try {
-			const formData = new FormData();
-			formData.set('year', selectedYear!);
-			formData.set('event', event);
-			const result = await fetch(`?/availablePhotos`, {
-				method: 'POST',
-				body: formData
-			});
-			const res = await result.json();
-			if (res.success) {
-				availablePhotos = res.photos;
-			}
-		} catch (e) {
-			console.error('Failed to load photos:', e);
-		} finally {
-			isLoading = false;
-		}
+		await goto(`/?year=${encodeURIComponent(selectedYear!)}&event=${encodeURIComponent(event)}`);
 	}
 
 	// Photo selection (opens popover)
@@ -135,13 +105,12 @@
 	function goBackToYears() {
 		selectedYear = null;
 		selectedEvent = null;
-		availablePhotos = [];
-		events = [];
+		goto('/');
 	}
 
 	function goBackToEvents() {
 		selectedEvent = null;
-		availablePhotos = [];
+		goto(`/?year=${encodeURIComponent(selectedYear!)}`);
 	}
 
 	// Get preview URL for a photo
@@ -170,9 +139,8 @@
 
 	<div class="flex flex-row items-center justify-between w-full bg-red-400">
 		<h1 class="text-2xl font-bold">Photo Manager</h1>
-		<button
-			type="button"
-			class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+		<Button
+			variant="default"
 			onclick={() => {
 				showBrowser = !showBrowser;
 				if (!showBrowser) {
@@ -184,7 +152,7 @@
 			}}
 		>
 			{showBrowser ? 'Close Browser' : 'Add Photo'}
-		</button>
+		</Button>
 	</div>
 
 	<!-- File Browser Section -->
@@ -332,17 +300,15 @@
 				{/if}
 
 				<div class="flex justify-end gap-2 pt-2">
-					<button
-						type="button"
-						class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+					<Button
+						variant="outline"
 						onclick={closePopover}
 						disabled={addLoading}
 					>
 						Close
-					</button>
-					<button
-						type="button"
-						class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90"
+					</Button>
+					<Button
+						variant="default"
 						onclick={addPhoto}
 						disabled={addLoading || !captionInput.trim()}
 					>
@@ -352,7 +318,7 @@
 						{:else}
 							Add Photo
 						{/if}
-					</button>
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -362,36 +328,38 @@
 	{#if addedPhotos.length > 0}
 		<div class="w-full space-y-4 pt-6 border-t border-border">
 			<h2 class="text-xl font-bold">Added Photos</h2>
-			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-				{#each addedPhotos as photo}
-					<div class="rounded-lg border bg-card text-card-foreground shadow-sm border-border">
-						<div class="p-3">
-							{#if photo.thumbURL}
-								<img
-									src={photo.thumbURL}
-									alt={photo.title}
-									class="w-full h-32 object-cover rounded-lg mb-2"
-								/>
-							{/if}
-							<h3 class="text-sm font-medium truncate">{photo.title}</h3>
-							{#if photo.camera}
-								<p class="text-xs text-muted-foreground">{photo.camera}</p>
-							{/if}
-							<div class="flex gap-1 mt-1 flex-wrap">
-								{#if photo.aperture}
-									<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">f/{photo.aperture}</span>
+			<ScrollArea class="w-full">
+				<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+					{#each addedPhotos as photo}
+						<div class="rounded-lg border bg-card text-card-foreground shadow-sm border-border">
+							<div class="p-3">
+								{#if photo.thumbURL}
+									<img
+										src={photo.thumbURL}
+										alt={photo.title}
+										class="w-full h-32 object-cover rounded-lg mb-2"
+									/>
 								{/if}
-								{#if photo.shutterSpeed}
-									<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">{photo.shutterSpeed}</span>
+								<h3 class="text-sm font-medium truncate">{photo.title}</h3>
+								{#if photo.camera}
+									<p class="text-xs text-muted-foreground">{photo.camera}</p>
 								{/if}
-								{#if photo.iso}
-									<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">ISO {photo.iso}</span>
-								{/if}
+								<div class="flex gap-1 mt-1 flex-wrap">
+									{#if photo.aperture}
+										<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">f/{photo.aperture}</span>
+									{/if}
+									{#if photo.shutterSpeed}
+										<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">{photo.shutterSpeed}</span>
+									{/if}
+									{#if photo.iso}
+										<span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">ISO {photo.iso}</span>
+									{/if}
+								</div>
 							</div>
 						</div>
-					</div>
-				{/each}
-			</div>
+					{/each}
+				</div>
+			</ScrollArea>
 		</div>
 	{/if}
 </section>
