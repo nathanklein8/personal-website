@@ -24,7 +24,7 @@ services:
     ports:
       - "${ADMIN_PORT}:3000"
     environment:
-      - ORIGIN=http://localhost:${ADMIN_PORT} # change this back to atlas, or make it dynamic somehow
+      - ORIGIN=http://${HOSTNAME}:${ADMIN_PORT}
       - API_URL=${API_URL}
     volumes:
       - photos-thumbnails:/thumbnails:ro
