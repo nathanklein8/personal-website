@@ -1,26 +1,15 @@
 import type { Actions, PageServerLoad } from './$types';
 import type { Photo } from '@nk/shared/types/photo';
-import { getAllPhotos, getURL } from '@nk/shared/server/backend';
+import { getAllPhotos, getAvailableYears, getAvailableEvents, getAvailablePhotos, addPhoto, updatePhoto, deletePhoto, regenerateThumbnails } from '@nk/shared/server/backend';
 
 export const load: PageServerLoad = async () => {
-    const apiURL = getURL();
-    const [photosRes, yearsRes] = await Promise.all([
-        fetch(`${apiURL}/api/photos?type=all`),
-        fetch(`${apiURL}/api/photos/available`)
+    const [photos, years] = await Promise.all([
+        getAllPhotos(),
+        getAvailableYears()
     ]);
 
-    let photos: Photo[] = [];
-    if (photosRes.ok) {
-        photos = await photosRes.json();
-    }
-
-    let years: string[] = [];
-    if (yearsRes.ok) {
-        years = await yearsRes.json();
-    }
-
     return {
-        photos,
+        photos: photos as Photo[],
         years
     };
 };
@@ -29,127 +18,61 @@ export const actions: Actions = {
     addPhoto: async ({ request }) => {
         const data = await request.formData();
 
-        const payload = {
-            filename: data.get("filename")?.toString() || '',
-            title: data.get("title")?.toString() || '',
-            sortOrder: parseInt(data.get("sortOrder")?.toString() || '0'),
-        };
+        const filename = data.get("filename")?.toString() || '';
+        const title = data.get("title")?.toString() || '';
+        const sortOrder = parseInt(data.get("sortOrder")?.toString() || '0');
 
-        const apiURL = getURL();
-        const res = await fetch(`${apiURL}/api/photos`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-            const body = await res.text();
-            return { failure: true, message: body || `Backend error: ${res.status}` };
-        }
-        const result = await res.json();
-        const photos = await getAllPhotos();
-        return { success: true, id: result.id, photos };
+        return await addPhoto(filename, title, sortOrder);
     },
 
     updatePhoto: async ({ request }) => {
         const data = await request.formData();
-        const id = data.get('id');
-
-        const payload: any = {};
-        const title = data.get("title")?.toString();
-        const sortOrder = data.get("sortOrder")?.toString();
+        const id = data.get('id')?.toString() || 'unknown';
+        const title = data.get("title")?.toString() || '';
+        const sortOrder = parseInt(data.get("sortOrder")?.toString() || '0');
         const visible = data.get("visible") === 'on';
 
-        if (title !== undefined) payload.title = title;
-        if (sortOrder !== undefined) payload.sortOrder = parseInt(sortOrder);
-        payload.visible = visible;
-
-        const apiURL = getURL();
-        const res = await fetch(`${apiURL}/api/photos/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-            const body = await res.text();
-            return { failure: true, id, message: body || `Backend error: ${res.status}` };
-        }
-        return { success: true, id };
+        return await updatePhoto(id, title, sortOrder, visible);
     },
 
     deletePhoto: async ({ request }) => {
         const data = await request.formData();
-        const id = data.get('id');
+        const id = data.get('id')?.toString() || 'unknown';
 
-        const apiURL = getURL();
-        const res = await fetch(`${apiURL}/api/photos/${id}`, {
-            method: "DELETE"
-        });
-
-        if (!res.ok) {
-            const body = await res.text();
-            return { failure: true, id, message: body || `Backend error: ${res.status}` };
-        }
-        return { success: true, id };
+        return await deletePhoto(id);
     },
 
     regenerateThumbnails: async () => {
-        const apiURL = getURL();
-        const res = await fetch(`${apiURL}/api/photos/regenerate-thumbnails`, {
-            method: "POST"
-        });
-
-        if (!res.ok) {
-            const body = await res.text();
-            return { failure: true, message: body || `Backend error: ${res.status}` };
-        }
-        return { success: true };
+        return await regenerateThumbnails();
     },
 
     availableYears: async () => {
-        const apiURL = getURL();
-        const res = await fetch(`${apiURL}/api/photos/available`);
-        if (!res.ok) {
-            return { failure: true, message: `Failed to load years: ${res.status}` };
-        }
-        const years = await res.json();
+        const years = await getAvailableYears();
         return { success: true, years };
     },
 
     availableEvents: async ({ request }) => {
-        const apiURL = getURL();
         const formData = await request.formData();
         const year = formData.get('year')?.toString();
         if (!year) {
             return { failure: true, message: 'No year specified' };
         }
-        const res = await fetch(`${apiURL}/api/photos/available/${encodeURIComponent(year)}`);
-        if (!res.ok) {
-            return { failure: true, message: `Failed to load events: ${res.status}` };
-        }
-        const events = await res.json();
+        const events = await getAvailableEvents(year);
         return { success: true, events };
     },
 
     availablePhotos: async ({ request }) => {
-        const apiURL = getURL();
         const formData = await request.formData();
         const year = formData.get('year')?.toString();
         const event = formData.get('event')?.toString();
         if (!year || !event) {
             return { failure: true, message: 'Year and event required' };
         }
-        const res = await fetch(`${apiURL}/api/photos/available/${encodeURIComponent(year)}/${encodeURIComponent(event)}`);
-        if (!res.ok) {
-            return { failure: true, message: `Failed to load photos: ${res.status}` };
-        }
-        const photos = await res.json();
+        const photos = await getAvailablePhotos(year, event);
         return { success: true, photos };
     },
 
     selectPhoto: async ({ request }) => {
-        const apiURL = getURL();
         const formData = await request.formData();
         const year = formData.get('year')?.toString();
         const event = formData.get('event')?.toString();
@@ -159,6 +82,4 @@ export const actions: Actions = {
         }
         return { success: true, year, event, filename };
     },
-
-
 };

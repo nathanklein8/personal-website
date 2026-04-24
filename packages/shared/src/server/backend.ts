@@ -93,6 +93,110 @@ export async function getPhotos() {
   return { photos, featuredPhotos: photos.filter((p: any) => p.visible !== false).slice(0, 3) };
 }
 
+export async function getAvailableYears() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos/available');
+
+  let years: string[] = [];
+  if (res.ok) {
+    years = await res.json();
+  } else {
+    console.error(`Unable to fetch available years: HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return years;
+}
+
+export async function getAvailableEvents(year: string) {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + `/api/photos/available/${encodeURIComponent(year)}`);
+
+  let events: string[] = [];
+  if (res.ok) {
+    events = await res.json();
+  } else {
+    console.error(`Unable to fetch available events for ${year}: HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return events;
+}
+
+export async function getAvailablePhotos(year: string, event: string) {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + `/api/photos/available/${encodeURIComponent(year)}/${encodeURIComponent(event)}`);
+
+  let photos: string[] = [];
+  if (res.ok) {
+    photos = await res.json();
+  } else {
+    console.error(`Unable to fetch available photos for ${year}/${event}: HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  return photos;
+}
+
+export async function addPhoto(filename: string, title: string, sortOrder: number) {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename, title, sortOrder })
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    return { success: false, message: body || `Backend error: ${res.status}` };
+  }
+
+  const result = await res.json();
+  const photos = await getAllPhotos();
+  return { success: true, id: result.id, photos };
+}
+
+export async function updatePhoto(id: string | number, title: string, sortOrder: number, visible: boolean) {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + `/api/photos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, sortOrder, visible })
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    return { success: false, id, message: body || `Backend error: ${res.status}` };
+  }
+
+  return { success: true, id };
+}
+
+export async function deletePhoto(id: string | number) {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + `/api/photos/${id}`, {
+    method: 'DELETE'
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    return { success: false, id, message: body || `Backend error: ${res.status}` };
+  }
+
+  return { success: true, id };
+}
+
+export async function regenerateThumbnails() {
+  const apiURL = getURL();
+  const res = await fetch(apiURL + '/api/photos/regenerate-thumbnails', {
+    method: 'POST'
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    return { success: false, message: body || `Backend error: ${res.status}` };
+  }
+
+  return { success: true };
+}
+
 export async function getContent<T extends readonly (() => Promise<any>)[]>(...getters: T) {
   const apiURL = getURL();
   const results = await Promise.all(getters.map(fn => fn()));

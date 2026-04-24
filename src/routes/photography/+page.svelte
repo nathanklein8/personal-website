@@ -28,13 +28,13 @@
 				>
 					<div class="aspect-square overflow-hidden bg-muted">
 						<img 
-							src={`${data.apiURL}/api/photos/${photo.id}/image`} 
+							src={`/api/photos/${photo.year}/${photo.event}/${photo.filename}/image`} 
 							alt={photo.altText || photo.title}
 							class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
 							loading="lazy"
 						/>
 					</div>
-					<div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+					<div class="absolute bottom-0 left-0 right-0 p-3 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
 						<p class="text-white text-sm font-medium truncate">{photo.title}</p>
 					</div>
 				</Card>
@@ -49,7 +49,7 @@
 		}} 
 		photo={{
 			...selectedPhoto,
-			src: selectedPhoto ? `${data.apiURL}/api/photos/${selectedPhoto.id}/image` : '',
+			src: selectedPhoto ? `/api/photos/${selectedPhoto.year}/${selectedPhoto.event}/${selectedPhoto.filename}/image` : '',
 			alt: selectedPhoto?.altText,
 			date: selectedPhoto?.dateTaken,
 			shutter: selectedPhoto?.shutterSpeed

@@ -16,4 +16,7 @@ export interface Photo {
   sourcePath: string;
   thumbnailPath?: string | null;
   mediumPath?: string | null;
+  year: string;
+  event: string;
+  filename: string;
 }

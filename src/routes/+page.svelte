@@ -37,7 +37,7 @@
 
 <section
 	id="landing"
-	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-linear-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
 >
 	<div class="font-code flex flex-col items-center space-y-4">
 		<h1 class="text-2xl sm:text-3xl">Hi! I'm Nathan</h1>
@@ -110,9 +110,9 @@
 						<CarouselItem class="basis-auto">
 							<div class="w-full bg-muted flex items-center justify-center overflow-hidden">
 								<img
-									src={`${data.apiURL}/api/photos/${photo.id}/image`}
+									src={`/me.jpg`}
 									alt={photo.altText || photo.title}
-									class="aspect-3/2 object-cover w-full max-h-[80vh]"
+									class="aspect-square object-cover w-full max-w-lg"
 								/>
 							</div>
 						</CarouselItem>
@@ -124,7 +124,7 @@
 		{/if}
 
 		{#if !(data.featuredPhotos && data.featuredPhotos.length > 0)}
-			<div class="text-center border-2 border-foreground bg-background p-24 text-center text-muted-foreground lg:p-32">
+			<div class="text-center border-2 border-foreground bg-background p-24 text-muted-foreground lg:p-32">
 				<p>No featured photos yet. Check back later!</p>
 			</div>
 		{/if}

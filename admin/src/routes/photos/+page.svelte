@@ -164,7 +164,7 @@
 
 <section
 	id="photos"
-	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-gradient-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
+	class="flex min-h-screen flex-col items-center justify-center gap-y-12 bg-linear-to-b from-green-700 to-background to-55% pt-24 pb-12 md:to-70%"
 >
 	<!-- Header -->
 
@@ -291,15 +291,20 @@
 	{/if}
 
 	<!-- Photo Popover (Dialog) -->
-	<!-- {#if selectedPhoto}
+	{#if selectedPhoto}
 		<div
 			role="dialog"
+			tabindex="-1"
 			class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-			onclick={closePopover}
+			onclick={(e) => {
+				if (e.target === e.currentTarget) closePopover();
+			}}
+			onkeydown={(e) => {
+				if (e.key === 'Escape') closePopover();
+			}}
 		>
 			<div
 				class="bg-background border border-border rounded-lg shadow-lg p-6 w-full max-w-md mx-4 space-y-4"
-				onclick={(e) => e.stopPropagation()}
 			>
 				<div class="relative aspect-video rounded-lg overflow-hidden bg-muted">
 					<img
@@ -355,7 +360,7 @@
 				</div>
 			</div>
 		</div>
-	{/if} -->
+	{/if}
 
 	<!-- Added Photos List -->
 	{#if addedPhotos.length > 0}

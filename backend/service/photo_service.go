@@ -176,19 +176,54 @@ func (s *PhotoService) ExtractEXIF(sourceAbsPath string) (*models.Photo, error) 
 // --- CRUD Operations ---
 
 func (s *PhotoService) GetAll(ctx context.Context) ([]models.Photo, error) {
-	return s.repo.GetAll(ctx)
+	photos, err := s.repo.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for i := range photos {
+		s.populatePathFields(&photos[i])
+	}
+	return photos, nil
 }
 
 func (s *PhotoService) GetVisible(ctx context.Context) ([]models.Photo, error) {
-	return s.repo.GetVisible(ctx)
+	photos, err := s.repo.GetVisible(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for i := range photos {
+		s.populatePathFields(&photos[i])
+	}
+	return photos, nil
 }
 
 func (s *PhotoService) GetFeatured(ctx context.Context) ([]models.Photo, error) {
-	return s.repo.GetFeatured(ctx)
+	photos, err := s.repo.GetFeatured(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for i := range photos {
+		s.populatePathFields(&photos[i])
+	}
+	return photos, nil
+}
+
+func (s *PhotoService) populatePathFields(photo *models.Photo) {
+	parts := strings.Split(photo.SourcePath, "/")
+	if len(parts) == 3 {
+		photo.Year = parts[0]
+		photo.Event = parts[1]
+		photo.Filename = parts[2]
+	}
 }
 
 func (s *PhotoService) GetByID(ctx context.Context, id int) (*models.Photo, error) {
-	return s.repo.GetByID(ctx, id)
+	photo, err := s.repo.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	s.populatePathFields(photo)
+	return photo, nil
 }
 
 func (s *PhotoService) AddPhoto(ctx context.Context, req models.AddPhotoRequest) (*models.Photo, error) {
